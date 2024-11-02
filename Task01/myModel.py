@@ -66,8 +66,24 @@ class myModel():
         colors = ['red' if label == 1 else 'blue' for label in Y.iloc[:, 0].values]
         plt.scatter(X.iloc[:, 0], X.iloc[:, 1], c=colors, marker='o', edgecolor='k', s=100)
         
+        # Add label for each scatter color
+        plt.scatter([], [], c='red', marker='o', edgecolor='k', s=100, label='Class 1: Positive')
+        plt.scatter([], [], c='blue', marker='o', edgecolor='k', s=100, label='Class 2: Negative')
+
+
         # Calculate the line based on weights and bias
-        
+        # range of values for x 
+        x_min, x_max = X.iloc[:, 0].min(), X.iloc[:, 0].max()
+
+        # Equation of decision line: w1 * x1 + w2 * x2 + b = 0
+        # Solving for x2 gives: x2 = -(w1 * x1 + b) / w2
+        # so w2 must be != 0
+        if self.weights[1] != 0:
+            x1_values = np.linspace(x_min, x_max, 100) # number values of line in x-axis
+            x2_values = -(self.weights[0] * x1_values + self.bias) / self.weights[1] # x2 values according to equation
+            plt.plot(x1_values, x2_values, color="green", label="Decision Boundary")
+
+
         plt.xlabel(X.columns[0])
         plt.ylabel(X.columns[1])
         plt.title("Decision Boundary")
