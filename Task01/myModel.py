@@ -1,9 +1,9 @@
 import pandas as pd
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 class myModel():
-    def __init__(self, learning_rate=0.01, n_epochs=1000):
+    def __init__(self, learning_rate, n_epochs):
         # Perceptron parameters
         self.learning_rate = learning_rate
         self.n_epochs = n_epochs
@@ -59,4 +59,18 @@ class myModel():
         }, index=['Actual Positive', 'Actual Negative'])
         
         return matrix
+
+    def plot_decision_boundary(self, X, Y):
+        plt.figure(figsize=(7, 5))
+        # Scatter plot of the data points with colors based on class labels
+        colors = ['red' if label == 1 else 'blue' for label in Y.iloc[:, 0].values]
+        plt.scatter(X.iloc[:, 0], X.iloc[:, 1], c=colors, marker='o', edgecolor='k', s=100)
+        
+        # Calculate the line based on weights and bias
+        
+        plt.xlabel(X.columns[0])
+        plt.ylabel(X.columns[1])
+        plt.title("Decision Boundary")
+        plt.legend()
+        plt.show()
 

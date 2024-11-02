@@ -8,5 +8,6 @@ class Adaline(myModel):
         super().__init__(learning_rate=learning_rate, n_epochs=n_epochs)
 
     def fit(self, X, Y):
+        print('Not implemented yet')
         # implement me please :(
         pass
