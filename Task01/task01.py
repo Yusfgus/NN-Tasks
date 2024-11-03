@@ -70,3 +70,5 @@ def Run(class1,class2, feature1, feature2, learning_rate, n_epochs, model_to_use
 
     confusion_matrix = my_model.confusion_matrix(Y=Y_test, Y_pred=Y_test_pred)
     print(confusion_matrix)
+
+    return accuracy ,confusion_matrix

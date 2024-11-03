@@ -1,5 +1,32 @@
 from tkinter import ttk
 import tkinter as tk
+import matplotlib.pyplot as plt
+import seaborn as sns
+from tkinter import Toplevel
+# Method to plot and display the confusion matrix in a new window
+def display_confusion_matrix(matrix):
+    # Create a new top-level window in Tkinter
+    cm_window = Toplevel()
+    cm_window.title("Confusion Matrix")
+
+    # Plotting
+    fig, ax = plt.subplots(figsize=(6, 4))
+    sns.heatmap(matrix, annot=True, fmt="d", cmap="Blues", cbar=False, square=True, ax=ax)
+    ax.set_title("Confusion Matrix")
+    plt.ylabel('Actual')
+    plt.xlabel('Predicted')
+
+    # Embed the plot in Tkinter window using a canvas
+    from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+    canvas = FigureCanvasTkAgg(fig, master=cm_window)
+    canvas.draw()
+    canvas.get_tk_widget().pack()
+
+# Example usage within your GUI's button click handler
+def on_display_confusion_matrix():
+    # Assuming Y and Y_pred are your true and predicted labels
+    matrix = confusion_matrix(Y, Y_pred)
+    display_confusion_matrix(matrix)
 
 from tkinter import filedialog, messagebox
 # import matplotlib.pyplot as plt
@@ -44,6 +71,25 @@ class FeatureSelector:
         #print(self.selected_features)
 selector = FeatureSelector()
 
+
+def display_confusion_matrix(matrix):
+    # Create a new top-level window in Tkinter
+    cm_window = Toplevel()
+    cm_window.title("Confusion Matrix")
+
+    # Plotting
+    fig, ax = plt.subplots(figsize=(6, 4))
+    sns.heatmap(matrix, annot=True, fmt="d", cmap="Blues", cbar=False, square=True, ax=ax)
+    ax.set_title("Confusion Matrix")
+    plt.ylabel('Actual')
+    plt.xlabel('Predicted')
+
+    # Embed the plot in Tkinter window using a canvas
+    from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+    canvas = FigureCanvasTkAgg(fig, master=cm_window)
+    canvas.draw()
+    canvas.get_tk_widget().pack()
+
 # Function to handle the run button
 def on_run(model_to_use='SLP'):
 
@@ -76,7 +122,10 @@ def on_run(model_to_use='SLP'):
     feature1, feature2 = selector.selected_features
 
     print(class1,class2, feature1, feature2, learning_rate, epochs, model_to_use)
-    Run(class1,class2, feature1, feature2, learning_rate, epochs, model_to_use)
+    accuracy , confusion_matrix = Run(class1,class2, feature1, feature2, learning_rate, epochs, model_to_use)
+
+    messagebox.showinfo("Success", f"Accuracy: {accuracy*100}%")
+    display_confusion_matrix(confusion_matrix)
     
 # Creating the main application window
 root = tk.Tk()
