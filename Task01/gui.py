@@ -9,6 +9,7 @@ from tkinter import filedialog, messagebox
 # from sklearn.metrics import accuracy_score
 import pandas as pd
 
+from task01 import Run
 
 
 # Class and Feature Button Handler
@@ -44,7 +45,15 @@ class FeatureSelector:
 selector = FeatureSelector()
 
 # Function to handle the run button
-def on_run():
+def on_run(model_to_use='SLP'):
+
+    if model_to_use == 'SLP':
+        adaline_btn.configure(style='TButton')
+        slp_btn.configure(style='Accent.TButton')
+    elif model_to_use == 'Adaline':
+        slp_btn.configure(style='TButton')
+        adaline_btn.configure(style='Accent.TButton')
+
     if len(selector.selected_classes) != 2:
         messagebox.showerror("Error", "Please select exactly two different classes.")
         return
@@ -66,7 +75,8 @@ def on_run():
     class1, class2 = selector.selected_classes
     feature1, feature2 = selector.selected_features
 
-    print(class1,class2, feature1, feature2, learning_rate, epochs)
+    print(class1,class2, feature1, feature2, learning_rate, epochs, model_to_use)
+    Run(class1,class2, feature1, feature2, learning_rate, epochs, model_to_use)
     
 # Creating the main application window
 root = tk.Tk()
@@ -155,8 +165,15 @@ epochs_entry = ttk.Entry(input_frame)
 epochs_entry.grid(column=1, row=1, padx=10, pady=10)
 
 # Run Button
-run_button = ttk.Button(frame, text="Run SLP", command=on_run)
-run_button.grid(column=0, row=6, columnspan=2)
+model_frame = ttk.Frame(frame, padding="5")
+model_frame.grid(row=6, column=0,columnspan=2, sticky=(tk.W, tk.E) , padx=10, pady=10)
+ttk.Label(model_frame, text="Model:").grid(column=0, row=0, sticky=tk.W, padx=10, pady=10)
+
+slp_btn = ttk.Button(model_frame, text="Run SLP", command=lambda: on_run('SLP'))
+slp_btn.grid(column=1, row=0, padx=10, pady=10)
+
+adaline_btn = ttk.Button(model_frame, text="Run Adaline", command=lambda: on_run('Adaline'))
+adaline_btn.grid(column=2, row=0, padx=10, pady=10)
 
 # Define a new style for the frame background color in ttk
 style = ttk.Style()
