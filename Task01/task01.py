@@ -8,7 +8,7 @@ import os
 feature_index = {'gender':0,'body_mass':1, 'beak_length':2, 'beak_depth':3, 'fin_length':4}
 class_index = {'A':0, 'B':1, 'C':2}
 
-def Run(class1,class2, feature1, feature2, learning_rate, n_epochs, model_to_use):
+def Run(class1,class2, feature1, feature2, learning_rate, n_epochs, model_to_use,bias_bool):
     print(os.getcwd())
     pass
 
@@ -39,9 +39,9 @@ def Run(class1,class2, feature1, feature2, learning_rate, n_epochs, model_to_use
     Y_test = pd.DataFrame(test.iloc[:,2])
 
     if model_to_use == 'SLP':
-        my_model = SLP(learning_rate=learning_rate, n_epochs=n_epochs)
+        my_model = SLP(learning_rate=learning_rate, n_epochs=n_epochs,bias_bool=bias_bool)
     elif model_to_use == 'Adaline':
-        my_model = Adaline(learning_rate=learning_rate, n_epochs=n_epochs)
+        my_model = Adaline(learning_rate=learning_rate, n_epochs=n_epochs,bias_bool=bias_bool)
 
     # Training
     preprocessing(data=X_train)
