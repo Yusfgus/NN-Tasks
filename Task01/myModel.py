@@ -62,14 +62,14 @@ class myModel():
 
     def plot_decision_boundary(self, X, Y):
         plt.figure(figsize=(7, 5))
+
         # Scatter plot of the data points with colors based on class labels
         colors = ['red' if label == 1 else 'blue' for label in Y.iloc[:, 0].values]
-        plt.scatter(X.iloc[:, 0], X.iloc[:, 1], c=colors, marker='o', edgecolor='k', s=100)
-        
-        # Add label for each scatter color
-        plt.scatter([], [], c='red', marker='o', edgecolor='k', s=100, label='Class 1: Positive')
-        plt.scatter([], [], c='blue', marker='o', edgecolor='k', s=100, label='Class 2: Negative')
+        plt.scatter(X.iloc[:, 0], X.iloc[:, 1], c=colors, s=100)  # Removed edgecolor='k'
 
+        # Add legend for each scatter color without edge color
+        plt.scatter([], [], c='red', s=100, label='Class 1: Positive')
+        plt.scatter([], [], c='blue', s=100, label='Class 2: Negative')
 
         # Calculate the line based on weights and bias
         # range of values for x 

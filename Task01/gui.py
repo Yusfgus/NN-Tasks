@@ -41,12 +41,23 @@ class FeatureSelector:
         #print(self.selected_features)
 selector = FeatureSelector()
 
+# Global variable to keep track of the confusion matrix window
+cm_window = None
 def display_confusion_matrix(matrix):
+    global cm_window
+
+    # If a confusion matrix window is already open, destroy it first
+    if cm_window is not None and cm_window.winfo_exists():
+        cm_window.destroy()
+    plt.close('all')  # Ensure all existing figures are closed
+
     # Create a new top-level window in Tkinter
     cm_window = Toplevel()
     cm_window.title("Confusion Matrix")
 
-    # Plotting
+    # Clear any previous plots to avoid overlaps
+
+    # Plotting the new confusion matrix
     fig, ax = plt.subplots(figsize=(6, 4))
     sns.heatmap(matrix, annot=True, fmt="d", cmap="Blues", cbar=False, square=True, ax=ax)
     ax.set_title("Confusion Matrix")
@@ -58,6 +69,9 @@ def display_confusion_matrix(matrix):
     canvas = FigureCanvasTkAgg(fig, master=cm_window)
     canvas.draw()
     canvas.get_tk_widget().pack()
+
+    # Ensure that the figure closes properly once the window is destroyed
+    cm_window.protocol("WM_DELETE_WINDOW", lambda: (plt.close(fig), cm_window.destroy()))
 
 
 # Function to handle the run button
