@@ -107,9 +107,10 @@ def on_run(model_to_use='SLP'):
     bias = Bias_var.get() == "1"
 
     print(class1,class2, feature1, feature2, learning_rate, epochs, bias ,model_to_use)
-    accuracy , confusion_matrix = Run(class1,class2, feature1, feature2, learning_rate, epochs, model_to_use,bias)
+    accuracy , confusion_matrix = Run(class1,class2, feature1, feature2, learning_rate, epochs, model_to_use,bias,TrainFrame=Train_frame,TestFrame=Test_frame)
 
-    messagebox.showinfo("Success", f"Accuracy: {accuracy*100}%")
+    #messagebox.showinfo("Success", f"Accuracy: {accuracy*100}%")
+    label_accuracy.config(text=f"Accuracy: {accuracy*100}%")
     display_confusion_matrix(confusion_matrix)
     
 # Creating the main application window
@@ -134,11 +135,11 @@ class_buttons = []
 class_names = ['A', 'B', 'C']
 
 class_frame = ttk.Frame(frame, padding="5")
-class_frame.grid(row=0, column=1, columnspan=5, sticky=(tk.W, tk.E))
-frame.columnconfigure(0, weight=1)  # Allow main frame to stretch
+class_frame.grid(row=0, column=0, sticky=(tk.W, tk.E))
+#frame.columnconfigure(0, weight=1)  # Allow main frame to stretch
 
 # Label for classes
-ttk.Label(frame, text="Select Classes:").grid(column=0, row=0, sticky=tk.W)
+ttk.Label(class_frame, text="Select Classes:").grid(column=0, row=0, sticky=tk.W)
 # Buttons for classes
 for i, class_name in enumerate(class_names):
     button = ttk.Button(
@@ -158,12 +159,12 @@ feature_buttons = []
 feature_names = ['gender', 'body_mass', 'beak_length', 'beak_depth', 'fin_length']
 
 feature_frame = ttk.Frame(frame, padding="5")
-feature_frame.grid(row=2, column=1, columnspan=len(feature_names), sticky=(tk.W, tk.E))
+feature_frame.grid(row=2, column=0, columnspan=len(feature_names), sticky=(tk.W, tk.E))
 frame.columnconfigure(0, weight=1)  # Allow main frame to stretch
 
 
 # Label for features
-ttk.Label(frame, text="Select Features:").grid(column=0, row=2, sticky=tk.W)
+ttk.Label(feature_frame, text="Select Features:").grid(column=0, row=0, sticky=tk.W)
 
 
 for i, feature_name in enumerate(feature_names):
@@ -199,13 +200,47 @@ No_Bias_radio.grid(row=2, column=1, padx=5, pady=5)
 # Run Button
 model_frame = ttk.Frame(frame, padding="5")
 model_frame.grid(row=6, column=0,columnspan=2, sticky=(tk.W, tk.E) , padx=10, pady=10)
-ttk.Label(model_frame, text="Model:").grid(column=0, row=0, sticky=tk.W, padx=10, pady=10)
+# ttk.Label(model_frame, text="Model:").grid(column=0, row=0, sticky=tk.W, padx=10, pady=10)
 
 slp_btn = ttk.Button(model_frame, text="Run SLP", command=lambda: on_run('SLP'))
 slp_btn.grid(column=1, row=0, padx=10, pady=10)
 
 adaline_btn = ttk.Button(model_frame, text="Run Adaline", command=lambda: on_run('Adaline'))
 adaline_btn.grid(column=2, row=0, padx=10, pady=10)
+
+label_accuracy = ttk.Label(
+            model_frame,
+            text="Accuracy: ",
+            justify="center",
+            font=("-size", 15, "-weight", "bold"),
+        )
+label_accuracy.grid(row=0, column=3, pady=10, columnspan=2)
+
+
+# # Two frames to display plots for train and test data
+
+# Configure the root window to allow row 7 to take up the remaining height
+root.rowconfigure(7, weight=1)
+
+# Create and configure Train_frame and Test_frame
+Train_frame = ttk.Frame(root, borderwidth=2)
+Train_frame.grid(row=7, column=0, padx=2, pady=2, sticky="nsew")
+
+Test_frame = ttk.Frame(root, borderwidth=2)
+Test_frame.grid(row=7, column=1, padx=2, pady=2, sticky="nsew")
+
+# Set each frame to take up half the screen width
+screen_width = root.winfo_screenwidth()
+Train_frame.config(width=screen_width // 2)
+Test_frame.config(width=screen_width // 2)
+
+# Ensure Train_frame and Test_frame expand within their row and column
+Train_frame.rowconfigure(0, weight=1)
+Train_frame.columnconfigure(0, weight=1)
+Test_frame.rowconfigure(0, weight=1)
+Test_frame.columnconfigure(0, weight=1)
+
+
 
 # Define a new style for the frame background color in ttk
 style = ttk.Style()

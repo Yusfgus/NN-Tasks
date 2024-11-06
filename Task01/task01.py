@@ -8,7 +8,7 @@ import os
 feature_index = {'gender':0,'body_mass':1, 'beak_length':2, 'beak_depth':3, 'fin_length':4}
 class_index = {'A':0, 'B':1, 'C':2}
 
-def Run(class1,class2, feature1, feature2, learning_rate, n_epochs, model_to_use,bias_bool):
+def Run(class1,class2, feature1, feature2, learning_rate, n_epochs, model_to_use,bias_bool,TrainFrame,TestFrame):
     print(os.getcwd())
     pass
 
@@ -51,7 +51,7 @@ def Run(class1,class2, feature1, feature2, learning_rate, n_epochs, model_to_use
 
     Y_train_pred = my_model.predict(X=X_train, column_name='bird category')
 
-    my_model.plot_decision_boundary(X=X_train, Y=Y_train)
+    my_model.plot_decision_boundary(X=X_train, Y=Y_train,frame=TrainFrame)
 
     accuracy = my_model.accuracy_score(Y=Y_train, Y_predict=Y_train_pred)
     print(f"train accuracy = {accuracy}")
@@ -64,6 +64,8 @@ def Run(class1,class2, feature1, feature2, learning_rate, n_epochs, model_to_use
     preprocessing(data=Y_test, classes=[class1, class2])
 
     Y_test_pred = my_model.predict(X=X_test, column_name='bird category')
+
+    my_model.plot_decision_boundary(X=X_test, Y=Y_test,frame=TestFrame)
 
     accuracy = my_model.accuracy_score(Y=Y_test, Y_predict=Y_test_pred)
     print(f"train accuracy = {accuracy}")
