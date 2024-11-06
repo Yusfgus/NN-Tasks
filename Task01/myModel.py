@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import seaborn as sns
 
 class myModel():
     def __init__(self, learning_rate, n_epochs):
@@ -110,3 +111,14 @@ class myModel():
 
         # Draw the canvas
         canvas.draw()
+
+    def display_confusion_matrix(self, matrix, title):
+        # Create a new plot for the confusion matrix
+        fig, ax = plt.subplots(figsize=(6, 4))
+        sns.heatmap(matrix, annot=True, fmt="d", cmap="Blues", cbar=False, square=True, ax=ax)
+        ax.set_title(title)
+        plt.ylabel('Actual')
+        plt.xlabel('Predicted')
+        
+        # Display the plot inline in Jupyter Notebook
+        plt.show()
