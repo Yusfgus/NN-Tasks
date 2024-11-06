@@ -5,6 +5,7 @@ import seaborn as sns
 from tkinter import Toplevel
 from tkinter import filedialog, messagebox
 import pandas as pd
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from task01 import Run
 
@@ -43,35 +44,33 @@ selector = FeatureSelector()
 
 # Global variable to keep track of the confusion matrix window
 cm_window = None
+
 def display_confusion_matrix(matrix):
     global cm_window
 
-    # If a confusion matrix window is already open, destroy it first
-    if cm_window is not None and cm_window.winfo_exists():
+    # If a confusion matrix canvas exists, clear it
+    if cm_window is not None:
         cm_window.destroy()
-    plt.close('all')  # Ensure all existing figures are closed
-
-    # Create a new top-level window in Tkinter
-    cm_window = Toplevel()
-    cm_window.title("Confusion Matrix")
-
-    # Clear any previous plots to avoid overlaps
 
     # Plotting the new confusion matrix
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig, ax = plt.subplots(figsize=(4.5, 3.6))
     sns.heatmap(matrix, annot=True, fmt="d", cmap="Blues", cbar=False, square=True, ax=ax)
-    ax.set_title("Confusion Matrix")
+    ax.set_title("Test Confusion Matrix")
     plt.ylabel('Actual')
     plt.xlabel('Predicted')
 
     # Embed the plot in Tkinter window using a canvas
     from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
+    # Create a canvas to display the plot in the frame
+    cm_window = ttk.Frame(right_frame)
+    cm_window.grid(row=0, column=4, padx=0, pady=0)  # Position it next to the feature buttons
+
     canvas = FigureCanvasTkAgg(fig, master=cm_window)
     canvas.draw()
     canvas.get_tk_widget().pack()
 
-    # Ensure that the figure closes properly once the window is destroyed
-    cm_window.protocol("WM_DELETE_WINDOW", lambda: (plt.close(fig), cm_window.destroy()))
+
 
 def update_frame_size():
     screen_width = root.winfo_screenwidth()
@@ -126,7 +125,7 @@ def on_run(model_to_use='SLP'):
     label_accuracy.config(text=f"Accuracy: {accuracy*100}%")
     display_confusion_matrix(confusion_matrix)
     
-# Creating the main application window
+# Create the main application window
 root = tk.Tk()
 root.title("Signal Reader")
 
@@ -142,17 +141,23 @@ root.tk.call("set_theme", "dark")
 frame = ttk.Frame(root, padding="10")
 frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
 
+# Create a new frame for the confusion matrix (right side of the main GUI elements)
+right_frame = ttk.Frame(root, padding="10")
+right_frame.grid(row=0, column=1 ,rowspan=6, sticky=(tk.N, tk.S, tk.E))
 
-# Creating a separate frame for class buttons to display them in a row
+# Create the confusion matrix placeholder in the right_frame
+# confusion_label = ttk.Label(right_frame, text="Confusion Matrix will appear here")
+# confusion_label.grid(row=0, column=0, sticky=tk.W, padx=10, pady=10)
+
+# Frame for class buttons to display them in a row
 class_buttons = []
 class_names = ['A', 'B', 'C']
-
 class_frame = ttk.Frame(frame, padding="5")
 class_frame.grid(row=0, column=0, sticky=(tk.W, tk.E))
-#frame.columnconfigure(0, weight=1)  # Allow main frame to stretch
 
 # Label for classes
 ttk.Label(class_frame, text="Select Classes:").grid(column=0, row=0, sticky=tk.W)
+
 # Buttons for classes
 for i, class_name in enumerate(class_names):
     button = ttk.Button(
@@ -164,22 +169,16 @@ for i, class_name in enumerate(class_names):
     button.grid(row=0, column=i+1, padx=10, pady=10)  # All buttons in a single row within class_frame
     class_buttons.append(button)
 
-
-
-
-# Creating a separate frame for feature buttons and setting display style
+# Frame for feature buttons and setting display style
 feature_buttons = []
 feature_names = ['gender', 'body_mass', 'beak_length', 'beak_depth', 'fin_length']
-
 feature_frame = ttk.Frame(frame, padding="5")
 feature_frame.grid(row=2, column=0, columnspan=len(feature_names), sticky=(tk.W, tk.E))
-frame.columnconfigure(0, weight=1)  # Allow main frame to stretch
-
 
 # Label for features
 ttk.Label(feature_frame, text="Select Features:").grid(column=0, row=0, sticky=tk.W)
 
-
+# Buttons for features
 for i, feature_name in enumerate(feature_names):
     button = ttk.Button(
         feature_frame,
@@ -190,9 +189,9 @@ for i, feature_name in enumerate(feature_names):
     button.grid(row=0, column=i+1, padx=10, pady=10)  # All buttons in a single row
     feature_buttons.append(button)
 
-# Learning Rate an Epochs number
+# Learning Rate and Epochs number
 input_frame = ttk.Frame(frame, padding="5")
-input_frame.grid(row=4, column=0,columnspan=2, sticky=(tk.W, tk.E) , padx=10, pady=10)
+input_frame.grid(row=4, column=0, columnspan=2, sticky=(tk.W, tk.E), padx=10, pady=10)
 
 ttk.Label(input_frame, text="Learning Rate:").grid(column=0, row=0, sticky=tk.W, padx=10, pady=10)
 learning_rate_entry = ttk.Entry(input_frame)
@@ -206,24 +205,15 @@ ttk.Label(input_frame, text="Number of Epochs:").grid(column=0, row=1, sticky=tk
 epochs_entry = ttk.Entry(input_frame)
 epochs_entry.grid(column=1, row=1, padx=10, pady=10)
 
-# Bias_var = tk.StringVar(value="1")
-# Bias_radio = ttk.Radiobutton(input_frame, text="With Bais", variable=Bias_var, value="1")
-# Bias_radio.grid(row=2, column=0, padx=5, pady=5)
-# No_Bias_radio = ttk.Radiobutton(input_frame, text="Without Bais", variable=Bias_var, value="0")
-# No_Bias_radio.grid(row=2, column=1, padx=5, pady=5)
-
 Bias_var = tk.BooleanVar(value=True)
 switch_Bias = ttk.Checkbutton(
     input_frame, text="Bias", style="Switch.TCheckbutton", variable=Bias_var
 )
 switch_Bias.grid(row=1, column=2, padx=5, pady=4)
 
-
-
 # Run Button
 model_frame = ttk.Frame(frame, padding="5")
-model_frame.grid(row=6, column=0,columnspan=2, sticky=(tk.W, tk.E) , padx=10, pady=10)
-# ttk.Label(model_frame, text="Model:").grid(column=0, row=0, sticky=tk.W, padx=10, pady=10)
+model_frame.grid(row=6, column=0, columnspan=2, sticky=(tk.W, tk.E), padx=10, pady=10)
 
 slp_btn = ttk.Button(model_frame, text="Run SLP", command=lambda: on_run('SLP'))
 slp_btn.grid(column=1, row=0, padx=10, pady=10)
@@ -232,11 +222,11 @@ adaline_btn = ttk.Button(model_frame, text="Run Adaline", command=lambda: on_run
 adaline_btn.grid(column=2, row=0, padx=10, pady=10)
 
 label_accuracy = ttk.Label(
-            model_frame,
-            text="Accuracy: ",
-            justify="center",
-            font=("-size", 15, "-weight", "bold"),
-        )
+    model_frame,
+    text="Accuracy: ",
+    justify="center",
+    font=("-size", 15, "-weight", "bold"),
+)
 label_accuracy.grid(row=0, column=3, pady=10, columnspan=2)
 
 

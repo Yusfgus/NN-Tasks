@@ -55,9 +55,9 @@ class myModel():
                 else: TN+=1
 
         matrix = df = pd.DataFrame({
-            'Predicted Positive': [TP, FP],
-            'Predicted Negative': [FN, TN]
-        }, index=['Actual Positive', 'Actual Negative'])
+            'Positive': [TP, FP],
+            'Negative': [FN, TN]
+        }, index=['Positive', 'Negative'])
         
         return matrix
 
