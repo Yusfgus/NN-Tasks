@@ -55,25 +55,32 @@ class myModel():
                 else: TN+=1
 
         matrix = df = pd.DataFrame({
-            'Predicted Positive': [TP, FP],
-            'Predicted Negative': [FN, TN]
-        }, index=['Actual Positive', 'Actual Negative'])
+            'Positive': [TP, FP],
+            'Negative': [FN, TN]
+        }, index=['Positive', 'Negative'])
         
         return matrix
 
-    def plot_decision_boundary(self, X, Y, frame):
+    def plot_decision_boundary(self, X, Y, frame, Title):
         # Clear existing widgets in the frame
         for widget in frame.winfo_children():
             widget.destroy()
 
-        # Get the dimensions of the frame
-        frame_width = max(frame.winfo_width(), 100)  # Use a minimum width if too small
-        frame_height = max(frame.winfo_height(), 100)  # Use a minimum height if too small
+        # Update the frame size to make sure it's properly sized
+        frame.update_idletasks()  # Forces the frame to update its size
+
+        # Get the dimensions of the frame after updating
+        frame_width = max(frame.winfo_width(), 100)
+        frame_height = max(frame.winfo_height(), 100)
+
+        # Optionally set the frame to take half the screen width
+        screen_width = frame.winfo_screenwidth()
+        frame.config(width=screen_width // 2)
 
         # Create a Matplotlib figure and axis with constrained layout
         fig, ax = plt.subplots(constrained_layout=True)
-        fig_width = max((frame_width / fig.dpi) - 1, 2)  # Minimum width of 2 inches
-        fig_height = max((frame_height / fig.dpi) - 1, 2)  # Minimum height of 2 inches
+        fig_width = max((frame_width / fig.dpi) - 1, 2)
+        fig_height = max((frame_height / fig.dpi) - 1, 2)
         fig.set_size_inches(fig_width, fig_height)
 
         # Scatter plot of the data points with colors based on class labels
@@ -94,19 +101,12 @@ class myModel():
         # Set labels and title
         ax.set_xlabel(X.columns[0])
         ax.set_ylabel(X.columns[1])
-        ax.set_title("Decision Boundary")
+        ax.set_title(Title)  # Use the passed title for the plot
 
         # Embed the Matplotlib figure in the Tkinter frame
         canvas = FigureCanvasTkAgg(fig, master=frame)
         canvas_widget = canvas.get_tk_widget()
-
-        # Use grid layout and expand canvas to fill the frame
         canvas_widget.grid(row=0, column=0, sticky="nsew")
-
-        # Configure the frame's grid layout to allow resizing
-        frame.rowconfigure(0, weight=1)
-        frame.columnconfigure(0, weight=1)
 
         # Draw the canvas
         canvas.draw()
-
