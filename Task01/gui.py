@@ -73,6 +73,12 @@ def display_confusion_matrix(matrix):
     # Ensure that the figure closes properly once the window is destroyed
     cm_window.protocol("WM_DELETE_WINDOW", lambda: (plt.close(fig), cm_window.destroy()))
 
+def update_frame_size():
+    screen_width = root.winfo_screenwidth()
+    Train_frame.config(width=screen_width // 2)
+    Test_frame.config(width=screen_width // 2)
+
+
 
 # Function to handle the run button
 def on_run(model_to_use='SLP'):
@@ -108,7 +114,10 @@ def on_run(model_to_use='SLP'):
 
     class1, class2 = selector.selected_classes
     feature1, feature2 = selector.selected_features
-    bias = Bias_var.get() == "1"
+    bias = Bias_var.get() 
+
+    # Call this function at the start to set frame sizes and whenever replotting
+    update_frame_size()
 
     print(class1,class2, feature1, feature2, learning_rate, epochs, bias ,model_to_use)
     accuracy , confusion_matrix = Run(class1,class2, feature1, feature2, learning_rate, epochs, model_to_use,bias,mx_mse,TrainFrame=Train_frame,TestFrame=Test_frame)
@@ -197,11 +206,17 @@ ttk.Label(input_frame, text="Number of Epochs:").grid(column=0, row=1, sticky=tk
 epochs_entry = ttk.Entry(input_frame)
 epochs_entry.grid(column=1, row=1, padx=10, pady=10)
 
-Bias_var = tk.StringVar(value="1")
-Bias_radio = ttk.Radiobutton(input_frame, text="With Bais", variable=Bias_var, value="1")
-Bias_radio.grid(row=2, column=0, padx=5, pady=5)
-No_Bias_radio = ttk.Radiobutton(input_frame, text="Without Bais", variable=Bias_var, value="0")
-No_Bias_radio.grid(row=2, column=1, padx=5, pady=5)
+# Bias_var = tk.StringVar(value="1")
+# Bias_radio = ttk.Radiobutton(input_frame, text="With Bais", variable=Bias_var, value="1")
+# Bias_radio.grid(row=2, column=0, padx=5, pady=5)
+# No_Bias_radio = ttk.Radiobutton(input_frame, text="Without Bais", variable=Bias_var, value="0")
+# No_Bias_radio.grid(row=2, column=1, padx=5, pady=5)
+
+Bias_var = tk.BooleanVar(value=True)
+switch_Bias = ttk.Checkbutton(
+    input_frame, text="Bias", style="Switch.TCheckbutton", variable=Bias_var
+)
+switch_Bias.grid(row=1, column=2, padx=5, pady=4)
 
 
 
@@ -242,11 +257,11 @@ screen_width = root.winfo_screenwidth()
 Train_frame.config(width=screen_width // 2)
 Test_frame.config(width=screen_width // 2)
 
-# Ensure Train_frame and Test_frame expand within their row and column
-Train_frame.rowconfigure(0, weight=1)
-Train_frame.columnconfigure(0, weight=1)
-Test_frame.rowconfigure(0, weight=1)
-Test_frame.columnconfigure(0, weight=1)
+# # Ensure Train_frame and Test_frame expand within their row and column
+# Train_frame.rowconfigure(0, weight=1)
+# Train_frame.columnconfigure(0, weight=1)
+# Test_frame.rowconfigure(0, weight=1)
+# Test_frame.columnconfigure(0, weight=1)
 
 
 

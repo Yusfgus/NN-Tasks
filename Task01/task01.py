@@ -49,7 +49,7 @@ def Run(class1,class2, feature1, feature2, learning_rate, n_epochs, model_to_use
 
     Y_train_pred = my_model.predict(X=X_train, column_name='bird category')
 
-    my_model.plot_decision_boundary(X=X_train, Y=Y_train,frame=TrainFrame)
+    my_model.plot_decision_boundary(X=X_train, Y=Y_train,frame=TrainFrame,Title="Train data")
 
     accuracy = my_model.accuracy_score(Y=Y_train, Y_predict=Y_train_pred)
     print(f"train accuracy = {accuracy}")
@@ -63,7 +63,7 @@ def Run(class1,class2, feature1, feature2, learning_rate, n_epochs, model_to_use
 
     Y_test_pred = my_model.predict(X=X_test, column_name='bird category')
 
-    my_model.plot_decision_boundary(X=X_test, Y=Y_test,frame=TestFrame)
+    my_model.plot_decision_boundary(X=X_test, Y=Y_test,frame=TestFrame,Title="Test data")
 
     accuracy = my_model.accuracy_score(Y=Y_test, Y_predict=Y_test_pred)
     print(f"train accuracy = {accuracy}")
