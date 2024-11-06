@@ -8,9 +8,7 @@ import os
 feature_index = {'gender':0,'body_mass':1, 'beak_length':2, 'beak_depth':3, 'fin_length':4}
 class_index = {'A':0, 'B':1, 'C':2}
 
-def Run(class1,class2, feature1, feature2, learning_rate, n_epochs, model_to_use,bias_bool,TrainFrame,TestFrame):
-    print(os.getcwd())
-    pass
+def Run(class1,class2, feature1, feature2, learning_rate, n_epochs, model_to_use,bias_bool,mx_mse,TrainFrame,TestFrame):
 
     all_data = pd.read_csv('Task01/birds.csv')
 
@@ -41,7 +39,7 @@ def Run(class1,class2, feature1, feature2, learning_rate, n_epochs, model_to_use
     if model_to_use == 'SLP':
         my_model = SLP(learning_rate=learning_rate, n_epochs=n_epochs,bias_bool=bias_bool)
     elif model_to_use == 'Adaline':
-        my_model = Adaline(learning_rate=learning_rate, n_epochs=n_epochs,bias_bool=bias_bool)
+        my_model = Adaline(learning_rate=learning_rate, n_epochs=n_epochs,bias_bool=bias_bool, mx_mse=mx_mse)
 
     # Training
     preprocessing(data=X_train)

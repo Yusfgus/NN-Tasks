@@ -101,13 +101,17 @@ def on_run(model_to_use='SLP'):
         messagebox.showerror("Error", "Please enter valid numbers for learning rate and epochs.")
         return
     
+    try:
+        mx_mse = float(max_mse_entry.get())
+    except ValueError:
+        mx_mse = 0
 
     class1, class2 = selector.selected_classes
     feature1, feature2 = selector.selected_features
     bias = Bias_var.get() == "1"
 
     print(class1,class2, feature1, feature2, learning_rate, epochs, bias ,model_to_use)
-    accuracy , confusion_matrix = Run(class1,class2, feature1, feature2, learning_rate, epochs, model_to_use,bias,TrainFrame=Train_frame,TestFrame=Test_frame)
+    accuracy , confusion_matrix = Run(class1,class2, feature1, feature2, learning_rate, epochs, model_to_use,bias,mx_mse,TrainFrame=Train_frame,TestFrame=Test_frame)
 
     #messagebox.showinfo("Success", f"Accuracy: {accuracy*100}%")
     label_accuracy.config(text=f"Accuracy: {accuracy*100}%")
@@ -184,6 +188,10 @@ input_frame.grid(row=4, column=0,columnspan=2, sticky=(tk.W, tk.E) , padx=10, pa
 ttk.Label(input_frame, text="Learning Rate:").grid(column=0, row=0, sticky=tk.W, padx=10, pady=10)
 learning_rate_entry = ttk.Entry(input_frame)
 learning_rate_entry.grid(column=1, row=0, padx=10, pady=10)
+
+ttk.Label(input_frame, text="Max MSE:").grid(column=2, row=0, sticky=tk.W, padx=10, pady=10)
+max_mse_entry = ttk.Entry(input_frame)
+max_mse_entry.grid(column=3, row=0, padx=10, pady=10)
 
 ttk.Label(input_frame, text="Number of Epochs:").grid(column=0, row=1, sticky=tk.W, padx=10, pady=10)
 epochs_entry = ttk.Entry(input_frame)

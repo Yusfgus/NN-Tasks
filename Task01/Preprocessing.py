@@ -63,7 +63,7 @@ def pre_bird_category(col, classes):
 def preprocessing(data, classes=[]):
 
     for col in data.columns:
-        print(f"Column: {col}")
+        # print(f"Column: {col}")
         if col == 'gender':
             data[col] = pre_gender(data[col])
         elif col == 'body_mass':
