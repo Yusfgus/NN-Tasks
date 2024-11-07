@@ -122,7 +122,7 @@ def on_run(model_to_use='SLP'):
     accuracy , confusion_matrix = Run(class1,class2, feature1, feature2, learning_rate, epochs, model_to_use,bias,mx_mse,TrainFrame=Train_frame,TestFrame=Test_frame)
 
     #messagebox.showinfo("Success", f"Accuracy: {accuracy*100}%")
-    label_accuracy.config(text=f"Accuracy: {accuracy*100}%")
+    label_accuracy.config(text=f"Testing Accuracy: {accuracy*100}%")
     display_confusion_matrix(confusion_matrix)
     
 # Create the main application window

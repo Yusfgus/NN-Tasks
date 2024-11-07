@@ -66,7 +66,7 @@ def Run(class1,class2, feature1, feature2, learning_rate, n_epochs, model_to_use
     my_model.plot_decision_boundary(X=X_test, Y=Y_test,frame=TestFrame,Title="Test data")
 
     accuracy = my_model.accuracy_score(Y=Y_test, Y_predict=Y_test_pred)
-    print(f"train accuracy = {accuracy}")
+    print(f"Test accuracy = {accuracy}")
 
     confusion_matrix = my_model.confusion_matrix(Y=Y_test, Y_pred=Y_test_pred)
     print(confusion_matrix)
