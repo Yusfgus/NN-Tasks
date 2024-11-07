@@ -71,11 +71,12 @@ def display_confusion_matrix(matrix):
     canvas.get_tk_widget().pack()
 
 
-
 def update_frame_size():
+    global cunt
     screen_width = root.winfo_screenwidth()
-    Train_frame.config(width=screen_width // 2)
     Test_frame.config(width=screen_width // 2)
+    Train_frame.config(width=screen_width // 2)
+
 
 
 
@@ -116,7 +117,7 @@ def on_run(model_to_use='SLP'):
     bias = Bias_var.get() 
 
     # Call this function at the start to set frame sizes and whenever replotting
-    update_frame_size()
+    #update_frame_size()
 
     print(class1,class2, feature1, feature2, learning_rate, epochs, bias ,model_to_use)
     accuracy , confusion_matrix = Run(class1,class2, feature1, feature2, learning_rate, epochs, model_to_use,bias,mx_mse,TrainFrame=Train_frame,TestFrame=Test_frame)
@@ -143,7 +144,7 @@ frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
 
 # Create a new frame for the confusion matrix (right side of the main GUI elements)
 right_frame = ttk.Frame(root, padding="10")
-right_frame.grid(row=0, column=1 ,rowspan=6, sticky=(tk.N, tk.S, tk.E))
+right_frame.grid(row=0, column=1 ,rowspan=6, padx=2, pady=2, sticky=(tk.N, tk.S, tk.E))
 
 # Create the confusion matrix placeholder in the right_frame
 # confusion_label = ttk.Label(right_frame, text="Confusion Matrix will appear here")
@@ -232,26 +233,24 @@ label_accuracy.grid(row=0, column=3, pady=10, columnspan=2)
 
 # # Two frames to display plots for train and test data
 
-# Configure the root window to allow row 7 to take up the remaining height
+# Configure the root window row to allow expansion
 root.rowconfigure(7, weight=1)
 
-# Create and configure Train_frame and Test_frame
-Train_frame = ttk.Frame(root, borderwidth=2)
+# Set and configure Train_frame and Test_frame with fixed width
+screen_width = root.winfo_screenwidth()
+fixed_width = screen_width // 2
+
+Train_frame = ttk.Frame(root, borderwidth=2, width=fixed_width)
 Train_frame.grid(row=7, column=0, padx=2, pady=2, sticky="nsew")
 
-Test_frame = ttk.Frame(root, borderwidth=2)
+Test_frame = ttk.Frame(root, borderwidth=2, width=fixed_width)
 Test_frame.grid(row=7, column=1, padx=2, pady=2, sticky="nsew")
 
-# Set each frame to take up half the screen width
-screen_width = root.winfo_screenwidth()
-Train_frame.config(width=screen_width // 2)
-Test_frame.config(width=screen_width // 2)
+# Ensure both frames maintain the specified width and don’t resize dynamically
+Train_frame.grid_propagate(False)
+Test_frame.grid_propagate(False)
 
-# # Ensure Train_frame and Test_frame expand within their row and column
-# Train_frame.rowconfigure(0, weight=1)
-# Train_frame.columnconfigure(0, weight=1)
-# Test_frame.rowconfigure(0, weight=1)
-# Test_frame.columnconfigure(0, weight=1)
+
 
 
 

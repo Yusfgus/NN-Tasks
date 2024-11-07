@@ -75,8 +75,8 @@ class myModel():
         frame_height = max(frame.winfo_height(), 100)
 
         # Optionally set the frame to take half the screen width
-        screen_width = frame.winfo_screenwidth()
-        frame.config(width=screen_width // 2)
+        # screen_width = frame.winfo_screenwidth()
+        # frame.config(width=screen_width // 2)
 
         # Create a Matplotlib figure and axis with constrained layout
         fig, ax = plt.subplots(constrained_layout=True)
