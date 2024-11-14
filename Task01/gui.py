@@ -46,14 +46,14 @@ selector = FeatureSelector()
 cm_window = None
 
 def display_confusion_matrix(matrix):
-    global cm_window
+    global cm_window, canvas
 
     # If a confusion matrix canvas exists, clear it
-    if cm_window is not None:
+    if 'cm_window' in globals() and cm_window is not None:
         cm_window.destroy()
 
-    # Plotting the new confusion matrix
-    fig, ax = plt.subplots(figsize=(4.5, 3.6))
+    # Define initial figure size
+    fig, ax = plt.subplots(figsize=(2.5, 2.5))
     sns.heatmap(matrix, annot=True, fmt="d", cmap="Blues", cbar=False, square=True, ax=ax)
     ax.set_title("Test Confusion Matrix")
     plt.ylabel('Actual')
@@ -62,20 +62,32 @@ def display_confusion_matrix(matrix):
     # Embed the plot in Tkinter window using a canvas
     from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-    # Create a canvas to display the plot in the frame
+    # Create a frame to display the plot
     cm_window = ttk.Frame(right_frame)
-    cm_window.grid(row=0, column=4, padx=0, pady=0)  # Position it next to the feature buttons
+    cm_window.grid(row=0, column=4, padx=0, pady=0, sticky="nsew")  # Make the frame resizable
 
+    # Create canvas for the figure
     canvas = FigureCanvasTkAgg(fig, master=cm_window)
     canvas.draw()
-    canvas.get_tk_widget().pack()
+    canvas.get_tk_widget().pack(fill="both", expand=True)  # Fill and expand to enable resizing
+
+    # Bind resize events to update the plot size
+    def resize_plot(event):
+        # Adjust the figure size to match the frame size
+        fig.set_size_inches(event.width / 100, event.height / 100)  # Adjust scaling as needed
+        fig.tight_layout()
+        canvas.draw()
+
+    # Bind the resize event to the canvas' parent frame
+    cm_window.bind("<Configure>", resize_plot)
 
 
-def update_frame_size():
-    global cunt
-    screen_width = root.winfo_screenwidth()
-    Test_frame.config(width=screen_width // 2)
-    Train_frame.config(width=screen_width // 2)
+
+# def update_frame_size():
+#     global cunt
+#     screen_width = root.winfo_screenwidth()
+#     Test_frame.config(width=screen_width // 2)
+#     Train_frame.config(width=screen_width // 2)
 
 
 
@@ -139,11 +151,11 @@ root.tk.call("source", "Task01/azure.tcl")
 root.tk.call("set_theme", "dark")
 
 # Creating UI elements
-frame = ttk.Frame(root, padding="10")
+frame = ttk.Frame(root, padding="5")
 frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
 
 # Create a new frame for the confusion matrix (right side of the main GUI elements)
-right_frame = ttk.Frame(root, padding="10")
+right_frame = ttk.Frame(root, padding="5")
 right_frame.grid(row=0, column=1 ,rowspan=6, padx=2, pady=2, sticky=(tk.N, tk.S, tk.E))
 
 # Create the confusion matrix placeholder in the right_frame
@@ -167,7 +179,7 @@ for i, class_name in enumerate(class_names):
         style='TButton',
         command=lambda idx=i: selector.toggle_class(class_names[idx], class_buttons[idx])
     )
-    button.grid(row=0, column=i+1, padx=10, pady=10)  # All buttons in a single row within class_frame
+    button.grid(row=0, column=i+1, padx=5, pady=5)  # All buttons in a single row within class_frame
     class_buttons.append(button)
 
 # Frame for feature buttons and setting display style
@@ -187,24 +199,24 @@ for i, feature_name in enumerate(feature_names):
         style='TButton',
         command=lambda idx=i: selector.toggle_feature(feature_names[idx], feature_buttons[idx])
     )
-    button.grid(row=0, column=i+1, padx=10, pady=10)  # All buttons in a single row
+    button.grid(row=0, column=i+1, padx=5, pady=5)  # All buttons in a single row
     feature_buttons.append(button)
 
 # Learning Rate and Epochs number
 input_frame = ttk.Frame(frame, padding="5")
-input_frame.grid(row=4, column=0, columnspan=2, sticky=(tk.W, tk.E), padx=10, pady=10)
+input_frame.grid(row=4, column=0, columnspan=2, sticky=(tk.W, tk.E), padx=5, pady=5)
 
-ttk.Label(input_frame, text="Learning Rate:").grid(column=0, row=0, sticky=tk.W, padx=10, pady=10)
+ttk.Label(input_frame, text="Learning Rate:").grid(column=0, row=0, sticky=tk.W, padx=5, pady=5)
 learning_rate_entry = ttk.Entry(input_frame)
-learning_rate_entry.grid(column=1, row=0, padx=10, pady=10)
+learning_rate_entry.grid(column=1, row=0, padx=5, pady=5)
 
-ttk.Label(input_frame, text="Max MSE:").grid(column=2, row=0, sticky=tk.W, padx=10, pady=10)
+ttk.Label(input_frame, text="Max MSE:").grid(column=2, row=0, sticky=tk.W, padx=5, pady=5)
 max_mse_entry = ttk.Entry(input_frame)
-max_mse_entry.grid(column=3, row=0, padx=10, pady=10)
+max_mse_entry.grid(column=3, row=0, padx=5, pady=5)
 
-ttk.Label(input_frame, text="Number of Epochs:").grid(column=0, row=1, sticky=tk.W, padx=10, pady=10)
+ttk.Label(input_frame, text="Number of Epochs:").grid(column=0, row=1, sticky=tk.W, padx=5, pady=5)
 epochs_entry = ttk.Entry(input_frame)
-epochs_entry.grid(column=1, row=1, padx=10, pady=10)
+epochs_entry.grid(column=1, row=1, padx=5, pady=5)
 
 Bias_var = tk.BooleanVar(value=True)
 switch_Bias = ttk.Checkbutton(
@@ -214,13 +226,13 @@ switch_Bias.grid(row=1, column=2, padx=5, pady=4)
 
 # Run Button
 model_frame = ttk.Frame(frame, padding="5")
-model_frame.grid(row=6, column=0, columnspan=2, sticky=(tk.W, tk.E), padx=10, pady=10)
+model_frame.grid(row=6, column=0, columnspan=2, sticky=(tk.W, tk.E), padx=5, pady=5)
 
 slp_btn = ttk.Button(model_frame, text="Run SLP", command=lambda: on_run('SLP'))
-slp_btn.grid(column=1, row=0, padx=10, pady=10)
+slp_btn.grid(column=1, row=0, padx=5, pady=5)
 
 adaline_btn = ttk.Button(model_frame, text="Run Adaline", command=lambda: on_run('Adaline'))
-adaline_btn.grid(column=2, row=0, padx=10, pady=10)
+adaline_btn.grid(column=2, row=0, padx=5, pady=5)
 
 label_accuracy = ttk.Label(
     model_frame,
@@ -228,7 +240,7 @@ label_accuracy = ttk.Label(
     justify="center",
     font=("-size", 15, "-weight", "bold"),
 )
-label_accuracy.grid(row=0, column=3, pady=10, columnspan=2)
+label_accuracy.grid(row=0, column=3, pady=5, columnspan=2)
 
 
 # # Two frames to display plots for train and test data

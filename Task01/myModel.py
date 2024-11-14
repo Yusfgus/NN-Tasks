@@ -80,8 +80,8 @@ class myModel():
 
         # Create a Matplotlib figure and axis with constrained layout
         fig, ax = plt.subplots(constrained_layout=True)
-        fig_width = max((frame_width / fig.dpi) - 1, 2)
-        fig_height = max((frame_height / fig.dpi) - 1, 2)
+        fig_width = max((frame_width / fig.dpi) - 2, 2)
+        fig_height = max((frame_height / fig.dpi) - 1.3, 2)
         fig.set_size_inches(fig_width, fig_height)
 
         # Scatter plot of the data points with colors based on class labels
