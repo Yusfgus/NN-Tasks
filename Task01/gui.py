@@ -27,7 +27,6 @@ class FeatureSelector:
             else:
                 messagebox.showwarning("Warning", "You can only select two classes. Deselect one to select another.")
 
-        #print(self.selected_classes)
 
     def toggle_feature(self, feature_name, button):
         if feature_name in self.selected_features:
@@ -82,16 +81,6 @@ def display_confusion_matrix(matrix):
     cm_window.bind("<Configure>", resize_plot)
 
 
-
-# def update_frame_size():
-#     global cunt
-#     screen_width = root.winfo_screenwidth()
-#     Test_frame.config(width=screen_width // 2)
-#     Train_frame.config(width=screen_width // 2)
-
-
-
-
 # Function to handle the run button
 def on_run(model_to_use='SLP'):
 
@@ -128,9 +117,6 @@ def on_run(model_to_use='SLP'):
     feature1, feature2 = selector.selected_features
     bias = Bias_var.get() 
 
-    # Call this function at the start to set frame sizes and whenever replotting
-    #update_frame_size()
-
     print(class1,class2, feature1, feature2, learning_rate, epochs, bias ,model_to_use)
     accuracy , confusion_matrix = Run(class1,class2, feature1, feature2, learning_rate, epochs, model_to_use,bias,mx_mse,TrainFrame=Train_frame,TestFrame=Test_frame)
 
@@ -157,10 +143,6 @@ frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
 # Create a new frame for the confusion matrix (right side of the main GUI elements)
 right_frame = ttk.Frame(root, padding="5")
 right_frame.grid(row=0, column=1 ,rowspan=6, padx=2, pady=2, sticky=(tk.N, tk.S, tk.E))
-
-# Create the confusion matrix placeholder in the right_frame
-# confusion_label = ttk.Label(right_frame, text="Confusion Matrix will appear here")
-# confusion_label.grid(row=0, column=0, sticky=tk.W, padx=10, pady=10)
 
 # Frame for class buttons to display them in a row
 class_buttons = []
@@ -261,10 +243,6 @@ Test_frame.grid(row=7, column=1, padx=2, pady=2, sticky="nsew")
 # Ensure both frames maintain the specified width and don’t resize dynamically
 Train_frame.grid_propagate(False)
 Test_frame.grid_propagate(False)
-
-
-
-
 
 # Define a new style for the frame background color in ttk
 style = ttk.Style()
