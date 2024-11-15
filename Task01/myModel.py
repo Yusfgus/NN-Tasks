@@ -62,50 +62,61 @@ class myModel():
         
         return matrix
 
-    def plot_decision_boundary(self, X, Y, frame, Title):
+    def plot_decision_boundary(self, X_train, Y_train, X_test, Y_test,Plot_frame, Title):
         # Clear existing widgets in the frame
-        for widget in frame.winfo_children():
+        for widget in Plot_frame.winfo_children():
             widget.destroy()
 
-        # Update the frame size to make sure it's properly sized
-        frame.update_idletasks()  # Forces the frame to update its size
+        Plot_frame.update_idletasks()
+        
+        # Get dimensions of the frame
+        frame_width = max(Plot_frame.winfo_width(), 100)
+        frame_height = max(Plot_frame.winfo_height(), 100)
 
-        # Get the dimensions of the frame after updating
-        frame_width = max(frame.winfo_width(), 100)
-        frame_height = max(frame.winfo_height(), 100)
-
-        # Optionally set the frame to take half the screen width
-        # screen_width = frame.winfo_screenwidth()
-        # frame.config(width=screen_width // 2)
-
-        # Create a Matplotlib figure and axis with constrained layout
-        fig, ax = plt.subplots(constrained_layout=True)
+        # Create a figure with two subplots
+        fig, (ax1, ax2) = plt.subplots(1, 2, constrained_layout=True)
         fig_width = max((frame_width / fig.dpi) - 2, 2)
-        fig_height = max((frame_height / fig.dpi) - 1.3, 2)
+        fig_height = max((frame_height / fig.dpi) - 1, 2)
         fig.set_size_inches(fig_width, fig_height)
 
-        # Scatter plot of the data points with colors based on class labels
-        colors = ['red' if label == 1 else 'blue' for label in Y.iloc[:, 0].values]
-        ax.scatter(X.iloc[:, 0], X.iloc[:, 1], c=colors, s=100)
 
-        # Add legend for each scatter color without edge color
-        ax.scatter([], [], c='red', label='Class 1: Positive')
-        ax.scatter([], [], c='blue', label='Class 2: Negative')
 
-        # Calculate the decision boundary line based on weights and bias, if weights are non-zero
-        x_min, x_max = X.iloc[:, 0].min(), X.iloc[:, 0].max()
-        if abs(self.weights[1]) > 1e-6:  # Avoid dividing by zero or near-zero weights
-            x1_values = np.linspace(x_min, x_max, 100)
+        # Plot train dataset
+        colors_train = ['red' if label == 1 else 'blue' for label in Y_train.iloc[:, 0].values]
+        ax1.scatter(X_train.iloc[:, 0], X_train.iloc[:, 1], c=colors_train, s=100)
+        ax1.scatter([], [], c='red', label='Class 1: Positive')
+        ax1.scatter([], [], c='blue', label='Class 2: Negative')
+        
+        x_min_train, x_max_train = X_train.iloc[:, 0].min(), X_train.iloc[:, 0].max()
+        if abs(self.weights[1]) > 1e-6:
+            x1_values = np.linspace(x_min_train, x_max_train, 100)
             x2_values = -(self.weights[0] * x1_values + self.bias) / self.weights[1]
-            ax.plot(x1_values, x2_values, color="green", label="Decision Boundary")
+            ax1.plot(x1_values, x2_values, color="green", label="Decision Boundary")
 
-        # Set labels and title
-        ax.set_xlabel(X.columns[0])
-        ax.set_ylabel(X.columns[1])
-        ax.set_title(Title)  # Use the passed title for the plot
+        ax1.set_xlabel(X_train.columns[0])
+        ax1.set_ylabel(X_train.columns[1])
+        ax1.set_title("Train Data")
+        ax1.legend()
+
+        # Plot test dataset
+        colors_test = ['red' if label == 1 else 'blue' for label in Y_test.iloc[:, 0].values]
+        ax2.scatter(X_test.iloc[:, 0], X_test.iloc[:, 1], c=colors_test, s=100)
+        ax2.scatter([], [], c='red', label='Class 1: Positive')
+        ax2.scatter([], [], c='blue', label='Class 2: Negative')
+        
+        x_min_test, x_max_test = X_test.iloc[:, 0].min(), X_test.iloc[:, 0].max()
+        if abs(self.weights[1]) > 1e-6:
+            x1_values = np.linspace(x_min_test, x_max_test, 100)
+            x2_values = -(self.weights[0] * x1_values + self.bias) / self.weights[1]
+            ax2.plot(x1_values, x2_values, color="green", label="Decision Boundary")
+
+        ax2.set_xlabel(X_test.columns[0])
+        ax2.set_ylabel(X_test.columns[1])
+        ax2.set_title("Test Data")
+        ax2.legend()
 
         # Embed the Matplotlib figure in the Tkinter frame
-        canvas = FigureCanvasTkAgg(fig, master=frame)
+        canvas = FigureCanvasTkAgg(fig, master=Plot_frame)
         canvas_widget = canvas.get_tk_widget()
         canvas_widget.grid(row=0, column=0, sticky="nsew")
 

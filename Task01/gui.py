@@ -118,7 +118,7 @@ def on_run(model_to_use='SLP'):
     bias = Bias_var.get() 
 
     print(class1,class2, feature1, feature2, learning_rate, epochs, bias ,model_to_use)
-    accuracy , confusion_matrix = Run(class1,class2, feature1, feature2, learning_rate, epochs, model_to_use,bias,mx_mse,TrainFrame=Train_frame,TestFrame=Test_frame)
+    accuracy , confusion_matrix = Run(class1,class2, feature1, feature2, learning_rate, epochs, model_to_use,bias,mx_mse,Plot_frame=Plot_frame)
 
     #messagebox.showinfo("Success", f"Accuracy: {accuracy*100}%")
     label_accuracy.config(text=f"Testing Accuracy: {accuracy*100}%")
@@ -229,20 +229,14 @@ label_accuracy.grid(row=0, column=3, pady=5, columnspan=2)
 
 # Configure the root window row to allow expansion
 root.rowconfigure(7, weight=1)
+root.columnconfigure(0, weight=1)  # Make column 0 expandable
+root.columnconfigure(1, weight=1)  # Make column 1 expandable
 
-# Set and configure Train_frame and Test_frame with fixed width
-screen_width = root.winfo_screenwidth()
-fixed_width = screen_width // 2
+# Set up a single frame to contain the plots
+Plot_frame = ttk.Frame(root, borderwidth=2)
+Plot_frame.grid(row=7, column=0, columnspan=2, padx=2, pady=2, sticky="nsew")
+Plot_frame.grid_propagate(False)  # Prevent the frame from resizing based on its content
 
-Train_frame = ttk.Frame(root, borderwidth=2, width=fixed_width)
-Train_frame.grid(row=7, column=0, padx=2, pady=2, sticky="nsew")
-
-Test_frame = ttk.Frame(root, borderwidth=2, width=fixed_width)
-Test_frame.grid(row=7, column=1, padx=2, pady=2, sticky="nsew")
-
-# Ensure both frames maintain the specified width and don’t resize dynamically
-Train_frame.grid_propagate(False)
-Test_frame.grid_propagate(False)
 
 # Define a new style for the frame background color in ttk
 style = ttk.Style()
