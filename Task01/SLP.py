@@ -12,6 +12,7 @@ class SLP(myModel):
 
     def fit(self, X, Y):
         for epoch in range(self.n_epochs):
+            no_update = True
             for i in range(X.shape[0]):
                 # Calculate the weighted sum with or without bias based on bias_bool
                 linear_output = np.dot(X.iloc[i].values, self.weights) + (self.bias if self.bias_bool else 0)
@@ -22,7 +23,12 @@ class SLP(myModel):
 
                 # Update weights and bias if there's an error
                 if y_pred != y:
+                    no_update = False
                     error = y - y_pred
                     self.weights += self.learning_rate * error * X.iloc[i].values
                     if self.bias_bool:  # Update bias only if bias_bool is True
                         self.bias += self.learning_rate * error
+
+            if no_update:
+                print(f"break in epoch #{epoch}")
+                break

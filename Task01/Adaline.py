@@ -29,4 +29,5 @@ class Adaline(myModel):
             
             MSE = total_error / X.shape[0]
             if MSE <= self.mx_mse:
+                print(f"break in epoch #{epoch}")
                 return
