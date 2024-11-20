@@ -1,6 +1,6 @@
 import numpy as np
 
-class BuildNeuralNetwork:
+class MLP:
     def __init__(self, layers, alpha, activation='sigmoid', bias=False):
         self.Weights = []  # weights for each layer
         self.layers = layers  # network architecture (list of layer sizes)
@@ -49,5 +49,5 @@ layers = [4, 6, 5, 4, 3]
 alpha = 0.01
 bias = True
 
-nn = BuildNeuralNetwork(layers, alpha, activation='sigmoid', bias=bias)
+nn = MLP(layers, alpha, activation='sigmoid', bias=bias)
 print(nn)
