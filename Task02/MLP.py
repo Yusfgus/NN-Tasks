@@ -1,5 +1,7 @@
 import numpy as np
 from sklearn.metrics import confusion_matrix
+import torch
+# import torch.nn as nn
 
 class Activations:
     @staticmethod
@@ -41,14 +43,14 @@ class MLP:
 
         # Initialize the weights for each layer
         for i in range(len(self.hiddenLayersSizes) - 1):  # Iterate through the layers, excluding the last one
-            # currentLayerSize = self.hiddenLayersSizes[i] + (1 if self.bias else 0)
-            currentLayerSize = self.hiddenLayersSizes[i] + 1
+            currentLayerSize = self.hiddenLayersSizes[i] + 1 # +1 for bias
             nextLayerSize = self.hiddenLayersSizes[i + 1]
 
             # Randomly initialize weights for this layer
-            self.weights.append(np.random.randn(currentLayerSize, nextLayerSize))
+            self.weights.append(np.random.randn(currentLayerSize, nextLayerSize) * np.sqrt(1. / currentLayerSize))
+            # self.weights.append(np.random.randn(currentLayerSize, nextLayerSize))
 
-        # print("Initial Weights : ", self.weights)
+        # print("\nInitial Weights : ", self.weights)
 
     # Feedforward function
     def feedForward(self, X):
@@ -98,22 +100,6 @@ class MLP:
             newWeights = np.array(np.array(np.dot(np.array(multiply_lists(learningRateList, sigmas)).T, self.activations[i]).T))
             oldWeights = np.array(self.weights[i])
             self.weights[i] =  newWeights + oldWeights
-        
-    def calculate_accuracy(self, X_train, y_train):
-        correct_train = 0
-        total_train = len(X_train)
-
-        # Predictions on the training data
-        for i in range(total_train):
-            predicted = self.predict(X_train.iloc[i])
-
-            actual = y_train.iloc[i]
-            if predicted == actual:
-                correct_train += 1
-
-        # Calculate accuracy
-        train_accuracy = correct_train / total_train * 100
-        return train_accuracy
     
     def fit(self, X, y):
         best_weights = None
@@ -139,7 +125,10 @@ class MLP:
                 best_weights = self.weights
 
         self.weights = best_weights
-        print("Best weights: ", best_weights)
+        self.save_model(self.weights)
+        # print("Best weights: ", best_weights)
+        # self.save_weights(best_weights)
+        return best_weights
 
     def predict(self, X):
         X_copy = X.copy()
@@ -155,7 +144,36 @@ class MLP:
         predicted_class = np.argmax(output)
         return predicted_class
     
-    def calculate_accuracy_and_confusion_matrix(self, X_train, y_train, X_test, y_test):
+
+    def save_weights(self, weights):
+        print("WEights in save : ", weights)
+        # with open('model_Weights.txt', 'w') as file:
+        #     file.write(f'Best Weights: \n')
+        #     for param_tensor in weights:
+        #         # Ensure tensor is on CPU and convert to numpy array
+        #         tensor = weights[param_tensor].cpu().numpy()
+        #         # Write parameter name and its corresponding values
+        #         file.write(f'{param_tensor}:\n{tensor}\n\n')
+
+    def save_model(self, accuracy, weights, save_path="SigmoidWeights.pth"):
+        # Save weights as a PyTorch model
+        torch.save({
+            'weights' : weights,
+            'train_accuracy' : train_accuracy,
+            'test_accuracy' : train_accuracy
+            }, save_path)
+        print(f"Model saved to {save_path}")
+
+    def load_model(self, save_path="SigmoidWeights.pth"):
+        # Load the model weights from a file
+        # self.weights = torch.load(save_path)
+        # print(f"Model loaded from {save_path}")
+        print(f"\nweights loaded from {save_path} is: \n {torch.load(save_path)}")
+
+
+    def calculate_accuracy_and_confusion_matrix(self, X_train, y_train, X_test, y_test, weights = None):
+        if weights != None: self.weights = weights
+
         # Initialize counters for accuracy and confusion matrix
         correct_train = 0
         correct_test = 0
