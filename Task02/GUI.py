@@ -6,7 +6,7 @@ from tkinter import *
 import customtkinter as ctk
 from Task02 import get_train_test
 from MLP import MLP
-
+from tkinter import filedialog
 ############################################################
     # Data Read (train, test)
 Xtrain, ytrain, Xtest, ytest = get_train_test()
@@ -119,10 +119,36 @@ def Classify():
 
 ############################################################
     # GUI cont.
+def Load_model():
+    ActivationFunc = ActivationFunc_Entry.get().lower()  # Activation function 
+    layers =[]
+    LearningRate =1
+    NumOfEpochs=100
+    if(ActivationFunc == "sigmoid"):
+        layers = [3,4]
+        LearningRate = 0.01
+        NumOfEpochs = 1000
+    else:
+        layers = [5]
+        LearningRate = 0.001
+        NumOfEpochs = 5000
+    MLP_Model = MLP(layers, LearningRate, 5, 3, ActivationFunc, NumOfEpochs, True)
+    MLP_Model.load()
+    TrainAccuracy, TestAccuracy, cm_train, cm_test = MLP_Model.calculate_accuracy_and_confusion_matrix(Xtrain, ytrain, Xtest, ytest)
+
+    # Update the labels with the new accuracy values
+    Train_Accuracy_Label.configure(text=f"Train Accuracy: {TrainAccuracy:.2f}%")
+    Test_Accuracy_Label.configure(text=f"Test Accuracy: {TestAccuracy:.2f}%")
+
 
 button = ctk.CTkButton(master = RightSideFrame, text = "Classify Now!", width=150, height=30, text_color="lightgreen", fg_color="darkgreen", 
                        border_width=1, border_color="#008318", command=Classify)
 button.place(x=650, y= 500, anchor=SE)
+
+button = ctk.CTkButton(master = RightSideFrame, text = "Load mode To classify!", width=150, height=30, text_color="lightgreen", fg_color="darkgreen", 
+                       border_width=1, border_color="#008318", command=Load_model)
+button.place(x=500, y= 500, anchor=SE)
+
 
 ############################################################
     # GUI Tail 

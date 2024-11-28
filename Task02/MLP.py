@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.metrics import confusion_matrix
-
+from tkinter import filedialog
 class Activations:
     @staticmethod
     def sigmoid(x):
@@ -167,12 +167,22 @@ class MLP:
                 np.savetxt(file, w, delimiter=",")
                 file.write("\n")  # Separate weight matrices with a newline
                     
-    def load(self, filename):
+    
+    def load(self):
         """
-        Load weights from a file.
-        :param filename: Name of the file to load the weights from.
+        Load weights from a user-selected file.
         """
         weights_loaded = []
+
+        # Open a file dialog to allow the user to select the file
+        filename = filedialog.askopenfilename(
+            title="Select Weights File",
+            filetypes=(("Text Files", "*.txt"), ("All Files", "*.*"))
+        )
+        
+        if not filename:
+            print("No file selected.")
+            return  # Exit if no file is selected
 
         with open(filename, 'r') as file:
             content = file.read().strip().split("\n\n")
@@ -183,7 +193,8 @@ class MLP:
 
         # Set the loaded weights to the current model
         self.weights = weights_loaded
-                
+        print(f"Weights successfully loaded from {filename}")
+
 
     def calculate_accuracy_and_confusion_matrix(self, X_train, y_train, X_test, y_test, weights = None):
         # print(f"weights => \n {weights}")
