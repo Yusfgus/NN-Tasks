@@ -20,30 +20,16 @@ Progress = 0
 ############################################################
     # Main window
 root = ctk.CTk()
-root.geometry("900x600")
+root.geometry("700x550")
 root.title("NN TASKS")
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
 
 ############################################################
-    # Left side frame
-LeftSideFrame = ctk.CTkFrame(master=root, width=250, height=600, border_width=2, border_color="#2a2a2a", fg_color="#282828")
-LeftSideFrame.place(relx=0, rely=0.5, anchor=W)
-
-LogoLabel = ctk.CTkLabel(master=LeftSideFrame, text="NN TASKS", font=("arial", 16, "bold"))
-LogoLabel.place(relx=0.5, y=30, anchor=N)
-
-button = ctk.CTkButton(master = LeftSideFrame, text = "Task 1", width=230, height=35, text_color="lightgreen", fg_color="darkgreen")
-button.place(relx=0.5, y= 100, anchor=CENTER)
-
-button = ctk.CTkButton(master = LeftSideFrame, text = "Task 2", width=230, height=35, text_color="lightgreen", fg_color="darkgreen")
-button.place(relx=0.5, y= 140, anchor=CENTER)
-
-############################################################
-    # Right side frame 
-RightSideFrame = ctk.CTkFrame(master=root, width=620, height=580, border_width=2, border_color="#2a2a2a", fg_color="#282828")
-RightSideFrame.place(x=890, rely=0.5, anchor=E)
+    # Right side frame w620
+RightSideFrame = ctk.CTkFrame(master=root, width=670, height=520, border_width=2, border_color="#2a2a2a", fg_color="#282828")
+RightSideFrame.place(x=15, rely=0.5, anchor=W)
 
 HeaderLabel = ctk.CTkLabel(master=RightSideFrame, text="TASK II - BACK PROPAGATION ON MULTILAYER NNs", font=("arial", 16, "bold"))
 HeaderLabel.place(x=20, y=10, anchor=NW)
@@ -123,13 +109,6 @@ def Classify():
     ActivationFunc = ActivationFunc_Entry.get().lower()  # Activation function 
     NeuronsPerLayers = [int(x) for x in NumOfNeuronsPerLayer_Entry.get().split(",")]
 
-    print("NumOfLayers", NumOfLayers)
-    print("NumOfEpochs", NumOfEpochs)
-    print("LearningRate", LearningRate)
-    print("isBiasEnabled", isBiasEnabled)
-    print("ActivationFunc", ActivationFunc)
-    print("NeuronsPerLayers", NeuronsPerLayers)
-
     MLP_Model = MLP(NeuronsPerLayers, LearningRate, 5, 3, ActivationFunc, NumOfEpochs, isBiasEnabled)
     MLP_Model.fit(Xtrain, ytrain,Progress_Label)
     TrainAccuracy, TestAccuracy, cm_train, cm_test = MLP_Model.calculate_accuracy_and_confusion_matrix(Xtrain, ytrain, Xtest, ytest)
@@ -143,7 +122,7 @@ def Classify():
 
 button = ctk.CTkButton(master = RightSideFrame, text = "Classify Now!", width=150, height=30, text_color="lightgreen", fg_color="darkgreen", 
                        border_width=1, border_color="#008318", command=Classify)
-button.place(x=590, y= 560, anchor=SE)
+button.place(x=650, y= 500, anchor=SE)
 
 ############################################################
     # GUI Tail 

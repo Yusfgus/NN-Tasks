@@ -1,7 +1,5 @@
 import numpy as np
 from sklearn.metrics import confusion_matrix
-import torch
-# import torch.nn as nn
 
 class Activations:
     @staticmethod
@@ -139,6 +137,7 @@ class MLP:
             #print(f"\rcompleted {((epoch+1)/self.epochs)*100:.0f}%", end="")
             Progress_Label.configure(text=f"\rcompleted {((epoch+1)/self.epochs)*100:.0f}%")
             Progress_Label.update_idletasks()
+
             if total_loss < least_total_loss:
                 least_total_loss = total_loss
                 best_weights = self.weights
