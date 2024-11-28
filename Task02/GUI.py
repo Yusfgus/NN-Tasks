@@ -113,7 +113,7 @@ NumOfFeatures = 5
 NumOfClasses = 3
 
 def Classify():
-    global TrainAccuracy, TestAccuracy
+    global TrainAccuracy, TestAccuracy,Progress_Label
 
     # Retrieve and parse user input
     NumOfLayers = int(NumOfLayers_Entry.get())  # Number of layers as integer
@@ -131,7 +131,7 @@ def Classify():
     print("NeuronsPerLayers", NeuronsPerLayers)
 
     MLP_Model = MLP(NeuronsPerLayers, LearningRate, 5, 3, ActivationFunc, NumOfEpochs, isBiasEnabled)
-    MLP_Model.fit(Xtrain, ytrain)
+    MLP_Model.fit(Xtrain, ytrain,Progress_Label)
     TrainAccuracy, TestAccuracy, cm_train, cm_test = MLP_Model.calculate_accuracy_and_confusion_matrix(Xtrain, ytrain, Xtest, ytest)
 
     # Update the labels with the new accuracy values

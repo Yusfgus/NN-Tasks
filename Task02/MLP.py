@@ -119,7 +119,7 @@ class MLP:
                 newWeights = newWeights.T
             self.weights[i] = newWeights + oldWeights
     
-    def fit(self, X, y):
+    def fit(self, X, y,Progress_Label):
         best_weights = None
         least_total_loss = float('inf')
         X = X.assign(bias= 1 if self.bias else 0)
@@ -136,7 +136,9 @@ class MLP:
                 output = self.activations[-1]
                 total_loss += np.mean((y_sample - output) ** 2)
             
-            print(f"\rcompleted {((epoch+1)/self.epochs)*100:.0f}%", end="")
+            #print(f"\rcompleted {((epoch+1)/self.epochs)*100:.0f}%", end="")
+            Progress_Label.configure(text=f"\rcompleted {((epoch+1)/self.epochs)*100:.0f}%")
+            Progress_Label.update_idletasks()
             if total_loss < least_total_loss:
                 least_total_loss = total_loss
                 best_weights = self.weights
