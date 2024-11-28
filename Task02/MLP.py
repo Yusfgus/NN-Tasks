@@ -88,7 +88,7 @@ class MLP:
 
         sigmaOutput = multiply_lists(error, self.activation_derivative(self.layersNets[-1]))
         
-        print("sigmaOutput = ", sigmaOutput)
+        #print("sigmaOutput = ", sigmaOutput)
         
         # print("sigmaOutput : ", sigmaOutput)
         sigmas = sigmaOutput
@@ -148,7 +148,7 @@ class MLP:
 
         self.weights = best_weights
         
-        self.save_model(least_total_loss, self.weights)
+        #self.save_model(least_total_loss, self.weights)
 
         return best_weights
 
@@ -163,29 +163,34 @@ class MLP:
         predicted_class = np.argmax(output)
         return predicted_class
     
-    def save_model(self, loss, weights, save_path="SigmoidWeights.pth"):
-        old_loss,  old_weights = self.load_model(save_path)
-        if loss < old_loss:
-            # Save weights as a PyTorch model
-            torch.save({
-                'loss' : loss,
-                'weights' : weights
-                }, save_path)
-            print(f"Model saved to {save_path}")
-        else: print(f"\n(model weights not saved as there are no improvements!)")
+    def save(self, filename):
+        """
+        Save weights to a file.
+        :param filename: Name of the file to save the weights.
+        """
+        with open(filename, 'w') as file:
+            # Save only weights
+            for w in self.weights:
+                np.savetxt(file, w, delimiter=",")
+                file.write("\n")  # Separate weight matrices with a newline
+                    
+    def load(self, filename):
+        """
+        Load weights from a file.
+        :param filename: Name of the file to load the weights from.
+        """
+        weights_loaded = []
 
-    def load_model(self, save_path="SigmoidWeights.pth"):
-        # Load the model weights from a file
-        try:
-            checkpoint = torch.load(save_path)  # Load the entire checkpoint once
-            loss, weights = checkpoint['loss'], checkpoint['weights']
-            # print(f"\nloss : {loss} - weights \n{weights}" )
-            # print(f"checkpoint : \n {checkpoint}")
-            # print(f"\nweights loaded from {save_path} is: \n {torch.load(save_path)}")
-            return loss, weights
-        except FileNotFoundError:
-            return float('inf'), None
+        with open(filename, 'r') as file:
+            content = file.read().strip().split("\n\n")
+            for w_str in content:
+                # Load weight matrix
+                weight_matrix = np.loadtxt(w_str.splitlines(), delimiter=',')
+                weights_loaded.append(weight_matrix)
 
+        # Set the loaded weights to the current model
+        self.weights = weights_loaded
+                
 
     def calculate_accuracy_and_confusion_matrix(self, X_train, y_train, X_test, y_test, weights = None):
         # print(f"weights => \n {weights}")
