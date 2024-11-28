@@ -1,7 +1,5 @@
 import numpy as np
 from sklearn.metrics import confusion_matrix
-import torch
-# import torch.nn as nn
 
 class Activations:
     @staticmethod
@@ -135,8 +133,9 @@ class MLP:
                 # Calculate loss (Mean Squared Error) for monitoring
                 output = self.activations[-1]
                 total_loss += np.mean((y_sample - output) ** 2)
-            
-            print(f"\rcompleted {((epoch+1)/self.epochs)*100:.0f}%", end="")
+
+            print(f"\rCompleted: {((epoch+1)/self.epochs)*100:.0f}%", end="")
+
             if total_loss < least_total_loss:
                 least_total_loss = total_loss
                 best_weights = self.weights
