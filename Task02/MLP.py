@@ -85,10 +85,9 @@ class MLP:
 
         error = y_one_hot - output_activation
 
-
         sigmaOutput = multiply_lists(error, self.activation_derivative(self.layersNets[-1]))
         
-        print("sigmaOutput = ", sigmaOutput)
+        #print("sigmaOutput = ", sigmaOutput)
         
         # print("sigmaOutput : ", sigmaOutput)
         sigmas = sigmaOutput

@@ -1,8 +1,8 @@
 # Our
-*.txt
+
 *.pdf
 *.rar
-*.csv
+
 
 # Ignore IDE-specific settings for PyCharm
 .idea/
