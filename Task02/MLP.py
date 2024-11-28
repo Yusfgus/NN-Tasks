@@ -16,15 +16,15 @@ class Activations:
         return np.tanh(x)
     @staticmethod
     def tanh_derivative(x):
-        return 1 - np.tanh(x)**2 
+        return 1 - np.tanh(x)**2
     
 def multiply_lists(list1, list2):
     return [a * b for a, b in zip(list1, list2)]
 
 class MLP:
     def __init__(self, hiddenLayersSizes, learningRate, inputLayerSize=5, outputLayerSize=3, activation='sigmoid', epochs = 1000 ,bias=True):
-        self.inputLayerSize = 5
-        self.outputLayerSize = 3
+        self.inputLayerSize = inputLayerSize
+        self.outputLayerSize = outputLayerSize
         self.weights = []  # weights for each layer
 
         self.hiddenLayersSizes = hiddenLayersSizes  # network architecture (list of layer sizes)
@@ -47,7 +47,7 @@ class MLP:
         
     def initialize_weights(self):
         """
-            Initialize weights for each layer 6*3 4*4 5*3
+            Initialize weights for each layer
         """
         for i in range(len(self.hiddenLayersSizes) - 1):  # Iterate through the layers, excluding the last one
             currentLayerSize = self.hiddenLayersSizes[i] + 1 # +1 for bias
@@ -79,35 +79,31 @@ class MLP:
     def backPropagation(self, X, y):
         # Feedforward
         output_activation = self.feedForward(X)
-
         self.sigmasList = []
         y_one_hot = np.eye(self.outputLayerSize)[y]
-
         error = y_one_hot - output_activation
-
-
         sigmaOutput = multiply_lists(error, self.activation_derivative(self.layersNets[-1]))
-        
-        #print("sigmaOutput = ", sigmaOutput)
-        
-        # print("sigmaOutput : ", sigmaOutput)
         sigmas = sigmaOutput
-
         for i in range(len(self.weights)-1, 0, -1):
             sigmas = multiply_lists(np.dot(sigmas , self.weights[i][:-1, :].T) , self.activation_derivative(self.layersNets[i-1]))
             self.sigmasList.append(sigmas)
-
-
         self.sigmasList.reverse()
         self.sigmasList.append(sigmaOutput)
-
         self.ModifyWeights()
-
 
     # def ModifyWeights(self):
     #     for i, sigmas in enumerate(self.sigmasList):
-    #         learningRateList = [self.learningRate] * np.array(sigmas).shape[1]
-    #         newWeights = np.array(np.array(np.dot(np.array(multiply_lists(learningRateList, sigmas)).T, self.activations[i]).T))
+    #         sigmas = np.array(sigmas).reshape(-1, 1)
+    #         learningRateList = np.full(sigmas.shape, self.learningRate)
+
+    #         print("LR shape : " , learningRateList.shape)
+
+    #         LRSIGMA_List = np.array(multiply_lists(learningRateList, sigmas)).T
+    #         print("LRSIGMA_List shape : " , LRSIGMA_List.shape)
+    #         print("self.activations shape : " , self.activations[i].T.shape)
+
+    #         # learningRateList = [self.learningRate] * np.array(sigmas).shape[1]
+    #         newWeights = np.array(np.dot(np.array(multiply_lists(learningRateList, sigmas)).T, self.activations[i]).T)
     #         oldWeights = np.array(self.weights[i])
     #         self.weights[i] =  newWeights + oldWeights
 
@@ -127,7 +123,6 @@ class MLP:
         best_weights = None
         least_total_loss = float('inf')
         X = X.assign(bias= 1 if self.bias else 0)
-
         for epoch in range(self.epochs):
             total_loss = 0
             # Loop over each training sample
@@ -147,9 +142,6 @@ class MLP:
                 best_weights = self.weights
 
         self.weights = best_weights
-        
-        #self.save_model(least_total_loss, self.weights)
-
         return best_weights
 
     def predict(self, X):
@@ -232,4 +224,4 @@ class MLP:
         print("Testing Confusion Matrix:")
         print(cm_test)
 
-        # return train_accuracy, test_accuracy, cm_train, cm_test
+        return train_accuracy, test_accuracy, cm_train, cm_test
