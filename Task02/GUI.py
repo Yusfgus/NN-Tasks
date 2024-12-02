@@ -145,9 +145,9 @@ button = ctk.CTkButton(master = RightSideFrame, text = "Classify Now!", width=15
                        border_width=1, border_color="#008318", command=Classify)
 button.place(x=650, y= 500, anchor=SE)
 
-button = ctk.CTkButton(master = RightSideFrame, text = "Load mode To classify!", width=150, height=30, text_color="lightgreen", fg_color="darkgreen", 
+button = ctk.CTkButton(master = RightSideFrame, text = "Load weights", width=150, height=30, text_color="lightgreen", fg_color="darkgreen", 
                        border_width=1, border_color="#008318", command=Load_model)
-button.place(x=500, y= 500, anchor=SE)
+button.place(x=480, y= 500, anchor=SE)
 
 
 ############################################################

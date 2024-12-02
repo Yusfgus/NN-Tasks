@@ -30,7 +30,7 @@ class MLP:
         self.hiddenLayersSizes.append(outputLayerSize)
 
         self.learningRate = learningRate  # learning rate
-        self.activation = activation  # activation function name
+        self.activationName = activation  # activation function name
         self.bias = bias  # whether to include bias
         self.activations = [] # list of activation result (f(Net[i])) for each layer
         self.layersNets = [] # contains lists of nets for each layer (ex. [[layer_1_Nets], [layer_2_Nets]], [...]).
@@ -89,22 +89,6 @@ class MLP:
         self.sigmasList.append(sigmaOutput)
         self.ModifyWeights()
 
-    # def ModifyWeights(self):
-    #     for i, sigmas in enumerate(self.sigmasList):
-    #         sigmas = np.array(sigmas).reshape(-1, 1)
-    #         learningRateList = np.full(sigmas.shape, self.learningRate)
-
-    #         print("LR shape : " , learningRateList.shape)
-
-    #         LRSIGMA_List = np.array(multiply_lists(learningRateList, sigmas)).T
-    #         print("LRSIGMA_List shape : " , LRSIGMA_List.shape)
-    #         print("self.activations shape : " , self.activations[i].T.shape)
-
-    #         # learningRateList = [self.learningRate] * np.array(sigmas).shape[1]
-    #         newWeights = np.array(np.dot(np.array(multiply_lists(learningRateList, sigmas)).T, self.activations[i]).T)
-    #         oldWeights = np.array(self.weights[i])
-    #         self.weights[i] =  newWeights + oldWeights
-
     def ModifyWeights(self):
         for i, sigmas in enumerate(self.sigmasList):
             sigmas = np.array(sigmas).reshape(-1, 1)  # Ensure sigmas is a column vector
@@ -143,6 +127,7 @@ class MLP:
                 best_weights = self.weights
 
         self.weights = best_weights
+        self.save(f"{self.activationName}.txt")
         return best_weights
 
     def predict(self, X):
@@ -167,7 +152,6 @@ class MLP:
                 np.savetxt(file, w, delimiter=",")
                 file.write("\n")  # Separate weight matrices with a newline
                     
-    
     def load(self):
         """
         Load weights from a user-selected file.
