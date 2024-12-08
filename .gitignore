@@ -3,6 +3,8 @@
 *.pdf
 *.rar
 *.csv
+*.h5
+*.sav
 
 # Ignore IDE-specific settings for PyCharm
 .idea/
