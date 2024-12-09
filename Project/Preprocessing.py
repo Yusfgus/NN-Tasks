@@ -4,6 +4,8 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer, SnowballStemmer
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 stop_words = set(stopwords.words('english'))
 stemmer = SnowballStemmer('english')
@@ -77,7 +79,7 @@ def preprocess_text(text, pre_method=2):
     cleaned_text = cleanText(tokens, pre_method)
     return cleaned_text
 
-def preprocess(train_data, test_data, pre_method):
+def preprocess(train_data, test_data, pre_method, fx_opt):
     print('Drop Nan...')
     print(f"\ttrain_data.shape before {train_data.shape}")
     train_data = train_data.dropna(subset=['Discussion'])
@@ -85,16 +87,44 @@ def preprocess(train_data, test_data, pre_method):
 
     print('start preprocessing...')
     train_Discussion_preprocessed = [preprocess_text(discussion, pre_method) for discussion in train_data['Discussion']]
-    test_Discussion_preprocessed = [preprocess_text(discussion, pre_method) for discussion in test_data['Discussion']]
-
-    print('TF-IDF...')
-    vectorizer = TfidfVectorizer()
-    vectorizer.fit(train_Discussion_preprocessed)
-
-    X_train = vectorizer.transform(train_Discussion_preprocessed)
-    X_test = vectorizer.transform(test_Discussion_preprocessed)
+    if test_data:
+        test_Discussion_preprocessed = [preprocess_text(discussion, pre_method) for discussion in test_data['Discussion']]
 
     print('Encoding Y_train...')
     Y_train = train_data['Category'].map(category_encoding)
 
-    return X_train, Y_train, X_test
+    if fx_opt == 1:
+        print('TF-IDF...')
+        vectorizer = TfidfVectorizer()
+        vectorizer.fit(train_Discussion_preprocessed)
+
+        X_train = vectorizer.transform(train_Discussion_preprocessed)
+        if test_data:
+            X_test = vectorizer.transform(test_Discussion_preprocessed)
+
+        return X_train, Y_train, X_test
+
+    elif fx_opt == 2:
+        print("Calc unique words...")
+        unique_words = set()
+        for sentence in train_Discussion_preprocessed:
+            words = sentence.split()  # Split
+            unique_words.update(words)       # Add words to the set
+
+        num_unique_words = len(unique_words)
+        print("\tNum of Unique words:", num_unique_words)
+
+        print('Tokenizer...')
+        tokenizer = Tokenizer(num_words=num_unique_words)  # Set max vocabulary size
+        tokenizer.fit_on_texts(train_Discussion_preprocessed)         # Fit tokenizer on training data 
+
+        X_train_seq = tokenizer.texts_to_sequences(train_Discussion_preprocessed)
+        if test_data:
+            X_test_seq = tokenizer.texts_to_sequences(test_Discussion_preprocessed)
+
+        # Pad sequences to ensure uniform length
+        max_sequence_length = max(len(sublist) for sublist in X_train_seq)
+        X_train_padded = pad_sequences(X_train_seq, maxlen=max_sequence_length, padding='post')
+        X_test_padded = pad_sequences(X_test_seq, maxlen=max_sequence_length, padding='post') if test_data else []
+
+        return X_train_padded, Y_train, X_test_padded, num_unique_words, max_sequence_length

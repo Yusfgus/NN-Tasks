@@ -5,6 +5,7 @@ from tensorflow.keras.utils import to_categorical
 
 class FFNN():
     def __init__(self, input_size, num_classes):
+        self.num_classes = num_classes
         # Define the model
         self.model = models.Sequential([
             layers.Input(shape=(input_size,)),  # Input layer with the specified input size
@@ -20,7 +21,7 @@ class FFNN():
 
     def fit(self, X_train, Y_train, epochs, batch_size=32):
         # Assuming Y_train contains labels in integer form (e.g., [0, 1, 2, 3, 4])
-        Y_train_categorical = to_categorical(Y_train, num_classes=5)
+        Y_train_categorical = to_categorical(Y_train, num_classes=self.num_classes)
 
         self.model.fit(X_train, Y_train_categorical, epochs=epochs, batch_size=batch_size)
 
