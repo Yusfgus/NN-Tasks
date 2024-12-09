@@ -87,8 +87,7 @@ def preprocess(train_data, test_data, pre_method, fx_opt):
 
     print('start preprocessing...')
     train_Discussion_preprocessed = [preprocess_text(discussion, pre_method) for discussion in train_data['Discussion']]
-    if test_data:
-        test_Discussion_preprocessed = [preprocess_text(discussion, pre_method) for discussion in test_data['Discussion']]
+    test_Discussion_preprocessed = [preprocess_text(discussion, pre_method) for discussion in test_data['Discussion']]
 
     print('Encoding Y_train...')
     Y_train = train_data['Category'].map(category_encoding)
@@ -99,19 +98,19 @@ def preprocess(train_data, test_data, pre_method, fx_opt):
         vectorizer.fit(train_Discussion_preprocessed)
 
         X_train = vectorizer.transform(train_Discussion_preprocessed)
-        if test_data:
-            X_test = vectorizer.transform(test_Discussion_preprocessed)
+        X_test = vectorizer.transform(test_Discussion_preprocessed)
 
         return X_train, Y_train, X_test
 
     elif fx_opt == 2:
-        print("Calc unique words...")
-        unique_words = set()
-        for sentence in train_Discussion_preprocessed:
-            words = sentence.split()  # Split
-            unique_words.update(words)       # Add words to the set
+        # print("Calc unique words...")
+        # unique_words = set()
+        # for sentence in train_Discussion_preprocessed:
+        #     words = sentence.split()  # Split
+        #     unique_words.update(words)       # Add words to the set
 
-        num_unique_words = len(unique_words)
+        # num_unique_words = len(unique_words)
+        num_unique_words = 10000
         print("\tNum of Unique words:", num_unique_words)
 
         print('Tokenizer...')
@@ -119,12 +118,12 @@ def preprocess(train_data, test_data, pre_method, fx_opt):
         tokenizer.fit_on_texts(train_Discussion_preprocessed)         # Fit tokenizer on training data 
 
         X_train_seq = tokenizer.texts_to_sequences(train_Discussion_preprocessed)
-        if test_data:
-            X_test_seq = tokenizer.texts_to_sequences(test_Discussion_preprocessed)
+        X_test_seq = tokenizer.texts_to_sequences(test_Discussion_preprocessed)
 
         # Pad sequences to ensure uniform length
-        max_sequence_length = max(len(sublist) for sublist in X_train_seq)
+        max_sequence_length = int(sum(len(s) for s in X_train_seq) / len(X_train_seq))
+        # max_sequence_length = max(len(sublist) for sublist in X_train_seq)
         X_train_padded = pad_sequences(X_train_seq, maxlen=max_sequence_length, padding='post')
-        X_test_padded = pad_sequences(X_test_seq, maxlen=max_sequence_length, padding='post') if test_data else []
+        X_test_padded = pad_sequences(X_test_seq, maxlen=max_sequence_length, padding='post')
 
         return X_train_padded, Y_train, X_test_padded, num_unique_words, max_sequence_length
