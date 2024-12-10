@@ -126,7 +126,8 @@ def preprocess(train_data, test_data, pre_method, fx_opt, glove_path=None, embed
         X_test_seq = tokenizer.texts_to_sequences(test_Discussion_preprocessed)
 
          # Set max_sequence_length to the longest sequence in the dataset
-        max_sequence_length =100
+        max_sequence_length = max(len(seq) for seq in X_train_seq + X_test_seq)
+
         
         X_train_padded = pad_sequences(X_train_seq, maxlen=max_sequence_length, padding='post')
         
