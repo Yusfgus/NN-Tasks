@@ -10,7 +10,9 @@ import numpy as np
 from tensorflow.keras.layers import Embedding, Input, Dense, Dropout, LayerNormalization, MultiHeadAttention # type: ignore
 from tensorflow.keras.models import Model # type: ignore
 
-stop_words = set(stopwords.words('english'))
+from nltk.corpus import words
+english_words = set(words.words())
+# stop_words = set(stopwords.words('english'))
 stemmer = SnowballStemmer('english')
 lemmatizer = WordNetLemmatizer()
 
@@ -69,19 +71,8 @@ def cleanText(tokens, choice=2):
         lemmatized_tokens = lemmatization(tokens, True)
         stemmed_tokens = stemming(lemmatized_tokens)
         cleaned_text = ' '.join(stemmed_tokens)
-
-
-    return cleaned_text
-
-def preprocess_text(text, pre_method=2):
-    # Tokenization
-    text = text.replace('\\n', ' ')
-    tokens = word_tokenize(text.lower())
-    tokens = [token for token in tokens if token not in string.punctuation and token not in stop_words]
     
-    cleaned_text = cleanText(tokens, pre_method)
     return cleaned_text
-
 
 def load_glove_embeddings(glove_file, word_index, embedding_dim=100):
     embeddings_index = {}
@@ -100,7 +91,20 @@ def load_glove_embeddings(glove_file, word_index, embedding_dim=100):
 
     return embedding_matrix
 
-
+def preprocess_text(text, pre_method=2):
+    # text = text.replace('\\n', ' ')
+    # text = re.sub(r'[^a-zA-Z0-9\s]|[\\n]', ' ', text) # Remove non-alphanumeric characters
+    # text = re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE) # Remove URLs
+    # Tokenization
+    tokens = word_tokenize(text.lower())
+    # tokens = [token for token in tokens if token not in string.punctuation and token not in stop_words]
+    
+    # Keep only words that are in the English dictionary
+    tokens = [token for token in tokens if token in english_words]
+    
+    # cleaned_text = cleanText(tokens, pre_method)
+    # return cleaned_text
+    return ' '.join(tokens)
 
 def preprocess(train_data, test_data, pre_method, fx_opt, glove_path=None, embedding_dim=100):
     print('Drop Nan...')
@@ -115,7 +119,48 @@ def preprocess(train_data, test_data, pre_method, fx_opt, glove_path=None, embed
     print('Encoding Y_train...')
     Y_train = train_data['Category'].map(category_encoding)
 
-    if fx_opt == 3:
+
+    if fx_opt == 1:
+        print('TF-IDF...')
+        vectorizer = TfidfVectorizer()
+        vectorizer.fit(train_Discussion_preprocessed)
+
+        X_train = vectorizer.transform(train_Discussion_preprocessed)
+        X_test = vectorizer.transform(test_Discussion_preprocessed)
+
+        return X_train, Y_train, X_test
+
+    elif fx_opt == 2:
+        print("Calc unique words...")
+        unique_words = set()
+        for sentence in train_Discussion_preprocessed:
+            words = sentence.split()  # Split
+            unique_words.update(words)       # Add words to the set
+
+        num_unique_words = len(unique_words)
+        # num_unique_words = 10000
+        print("\tNum of Unique words:", num_unique_words)
+
+        print('Tokenizer...')
+        tokenizer = Tokenizer(num_words=num_unique_words)  # Set max vocabulary size
+        tokenizer.fit_on_texts(train_Discussion_preprocessed)         # Fit tokenizer on training data 
+
+        X_train_seq = tokenizer.texts_to_sequences(train_Discussion_preprocessed)
+        X_test_seq = tokenizer.texts_to_sequences(test_Discussion_preprocessed)
+
+        # Pad sequences to ensure uniform length
+        avg_sequence_length = int(sum(len(s) for s in X_train_seq) / len(X_train_seq))
+        print(f"avg_sequence_length = {avg_sequence_length}")
+        max_sequence_length = max(len(sublist) for sublist in X_train_seq)
+        print(f"max_sequence_length = {max_sequence_length}")
+        maxlen = int(input("Enter maxlen: "))
+
+        X_train_padded = pad_sequences(X_train_seq, maxlen=maxlen, padding='post')
+        X_test_padded = pad_sequences(X_test_seq, maxlen=maxlen, padding='post')
+
+        return X_train_padded, Y_train, X_test_padded, num_unique_words, maxlen
+
+    elif fx_opt == 3:
         print("Using GloVe embeddings with Transformer model...")
 
         # Tokenization
@@ -139,39 +184,3 @@ def preprocess(train_data, test_data, pre_method, fx_opt, glove_path=None, embed
 
         return X_train_padded, Y_train, X_test_padded, embedding_matrix, max_sequence_length
 
-
-    elif fx_opt == 1:
-        print('TF-IDF...')
-        vectorizer = TfidfVectorizer()
-        vectorizer.fit(train_Discussion_preprocessed)
-
-        X_train = vectorizer.transform(train_Discussion_preprocessed)
-        X_test = vectorizer.transform(test_Discussion_preprocessed)
-
-        return X_train, Y_train, X_test
-
-    elif fx_opt == 2:
-        # print("Calc unique words...")
-        # unique_words = set()
-        # for sentence in train_Discussion_preprocessed:
-        #     words = sentence.split()  # Split
-        #     unique_words.update(words)       # Add words to the set
-
-        # num_unique_words = len(unique_words)
-        num_unique_words = 10000
-        print("\tNum of Unique words:", num_unique_words)
-
-        print('Tokenizer...')
-        tokenizer = Tokenizer(num_words=num_unique_words)  # Set max vocabulary size
-        tokenizer.fit_on_texts(train_Discussion_preprocessed)         # Fit tokenizer on training data 
-
-        X_train_seq = tokenizer.texts_to_sequences(train_Discussion_preprocessed)
-        X_test_seq = tokenizer.texts_to_sequences(test_Discussion_preprocessed)
-
-        # Pad sequences to ensure uniform length
-        max_sequence_length = int(sum(len(s) for s in X_train_seq) / len(X_train_seq))
-        # max_sequence_length = max(len(sublist) for sublist in X_train_seq)
-        X_train_padded = pad_sequences(X_train_seq, maxlen=max_sequence_length, padding='post')
-        X_test_padded = pad_sequences(X_test_seq, maxlen=max_sequence_length, padding='post')
-
-        return X_train_padded, Y_train, X_test_padded, num_unique_words, max_sequence_length
