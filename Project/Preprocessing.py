@@ -10,9 +10,12 @@ import numpy as np
 from tensorflow.keras.layers import Embedding, Input, Dense, Dropout, LayerNormalization, MultiHeadAttention # type: ignore
 from tensorflow.keras.models import Model # type: ignore
 
+import pickle
+import re
+
 from nltk.corpus import words
-english_words = set(words.words())
-# stop_words = set(stopwords.words('english'))
+# english_words = set(words.words())
+stop_words = set(stopwords.words('english'))
 stemmer = SnowballStemmer('english')
 lemmatizer = WordNetLemmatizer()
 
@@ -93,18 +96,14 @@ def load_glove_embeddings(glove_file, word_index, embedding_dim=100):
 
 def preprocess_text(text, pre_method=2):
     # text = text.replace('\\n', ' ')
-    # text = re.sub(r'[^a-zA-Z0-9\s]|[\\n]', ' ', text) # Remove non-alphanumeric characters
-    # text = re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE) # Remove URLs
+    text = re.sub(r'[^a-zA-Z0-9\s]|[\\n]', ' ', text) # Remove non-alphanumeric characters
+    text = re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE) # Remove URLs
     # Tokenization
     tokens = word_tokenize(text.lower())
-    # tokens = [token for token in tokens if token not in string.punctuation and token not in stop_words]
+    tokens = [token for token in tokens if token not in string.punctuation and token not in stop_words]
     
-    # Keep only words that are in the English dictionary
-    tokens = [token for token in tokens if token in english_words]
-    
-    # cleaned_text = cleanText(tokens, pre_method)
-    # return cleaned_text
-    return ' '.join(tokens)
+    cleaned_text = cleanText(tokens, pre_method)
+    return cleaned_text
 
 def preprocess(train_data, test_data, pre_method, fx_opt, glove_path=None, embedding_dim=100):
     print('Drop Nan...')
@@ -131,19 +130,13 @@ def preprocess(train_data, test_data, pre_method, fx_opt, glove_path=None, embed
         return X_train, Y_train, X_test
 
     elif fx_opt == 2:
-        print("Calc unique words...")
-        unique_words = set()
-        for sentence in train_Discussion_preprocessed:
-            words = sentence.split()  # Split
-            unique_words.update(words)       # Add words to the set
-
-        num_unique_words = len(unique_words)
-        # num_unique_words = 10000
+        num_unique_words = 20000
         print("\tNum of Unique words:", num_unique_words)
 
         print('Tokenizer...')
         tokenizer = Tokenizer(num_words=num_unique_words)  # Set max vocabulary size
         tokenizer.fit_on_texts(train_Discussion_preprocessed)         # Fit tokenizer on training data 
+        print('finish fitting...')
 
         X_train_seq = tokenizer.texts_to_sequences(train_Discussion_preprocessed)
         X_test_seq = tokenizer.texts_to_sequences(test_Discussion_preprocessed)
