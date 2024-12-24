@@ -3,7 +3,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer, SnowballStemmer
 from nltk.tokenize import word_tokenize
-from sklearn.feature_extraction.text import TfidfVectorizer
+
 from tensorflow.keras.preprocessing.text import Tokenizer # type: ignore
 from tensorflow.keras.preprocessing.sequence import pad_sequences # type: ignore
 import numpy as np
@@ -105,6 +105,7 @@ def preprocess_text(text, pre_method=2):
     cleaned_text = cleanText(tokens, pre_method)
     return cleaned_text
 
+
 def preprocess(train_data, test_data, pre_method, fx_opt, glove_path=None, embedding_dim=100):
     print('Drop Nan...')
     print(f"\ttrain_data.shape before {train_data.shape}")
@@ -119,17 +120,7 @@ def preprocess(train_data, test_data, pre_method, fx_opt, glove_path=None, embed
     Y_train = train_data['Category'].map(category_encoding)
 
 
-    if fx_opt == 1:
-        print('TF-IDF...')
-        vectorizer = TfidfVectorizer()
-        vectorizer.fit(train_Discussion_preprocessed)
-
-        X_train = vectorizer.transform(train_Discussion_preprocessed)
-        X_test = vectorizer.transform(test_Discussion_preprocessed)
-
-        return X_train, Y_train, X_test
-
-    elif fx_opt == 2:
+    if fx_opt == 2:
         num_unique_words = 20000
         print("\tNum of Unique words:", num_unique_words)
 
