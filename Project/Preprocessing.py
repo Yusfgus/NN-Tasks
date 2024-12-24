@@ -75,6 +75,9 @@ def cleanText(tokens, choice=2):
         stemmed_tokens = stemming(lemmatized_tokens)
         cleaned_text = ' '.join(stemmed_tokens)
     
+    elif choice == 0: # None
+        cleaned_text = ' '.join(tokens)
+
     return cleaned_text
 
 def load_glove_embeddings(glove_file, word_index, embedding_dim=100):
@@ -105,7 +108,6 @@ def preprocess_text(text, pre_method=2):
     cleaned_text = cleanText(tokens, pre_method)
     return cleaned_text
 
-
 def preprocess(train_data, test_data, pre_method, fx_opt, glove_path=None, embedding_dim=100):
     print('Drop Nan...')
     print(f"\ttrain_data.shape before {train_data.shape}")
@@ -120,31 +122,7 @@ def preprocess(train_data, test_data, pre_method, fx_opt, glove_path=None, embed
     Y_train = train_data['Category'].map(category_encoding)
 
 
-    if fx_opt == 2:
-        num_unique_words = 20000
-        print("\tNum of Unique words:", num_unique_words)
-
-        print('Tokenizer...')
-        tokenizer = Tokenizer(num_words=num_unique_words)  # Set max vocabulary size
-        tokenizer.fit_on_texts(train_Discussion_preprocessed)         # Fit tokenizer on training data 
-        print('finish fitting...')
-
-        X_train_seq = tokenizer.texts_to_sequences(train_Discussion_preprocessed)
-        X_test_seq = tokenizer.texts_to_sequences(test_Discussion_preprocessed)
-
-        # Pad sequences to ensure uniform length
-        avg_sequence_length = int(sum(len(s) for s in X_train_seq) / len(X_train_seq))
-        print(f"avg_sequence_length = {avg_sequence_length}")
-        max_sequence_length = max(len(sublist) for sublist in X_train_seq)
-        print(f"max_sequence_length = {max_sequence_length}")
-        maxlen = int(input("Enter maxlen: "))
-
-        X_train_padded = pad_sequences(X_train_seq, maxlen=maxlen, padding='post')
-        X_test_padded = pad_sequences(X_test_seq, maxlen=maxlen, padding='post')
-
-        return X_train_padded, Y_train, X_test_padded, num_unique_words, maxlen
-
-    elif fx_opt == 3:
+    if fx_opt == 3:
         print("Using GloVe embeddings with Transformer model...")
 
         # Tokenization
