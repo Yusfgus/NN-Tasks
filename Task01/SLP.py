@@ -16,7 +16,7 @@ class SLP(myModel):
             for i in range(X.shape[0]):
                 # Calculate the weighted sum with or without bias based on bias_bool
                 linear_output = np.dot(X.iloc[i].values, self.weights) + (self.bias if self.bias_bool else 0)
-                #print(self.bias_bool)
+                
                 # Apply signum function
                 y_pred = 1 if linear_output >= 0 else -1
                 y = Y.iloc[i, 0]
