@@ -4,12 +4,6 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer, SnowballStemmer
 from nltk.tokenize import word_tokenize
 
-from tensorflow.keras.preprocessing.text import Tokenizer # type: ignore
-from tensorflow.keras.preprocessing.sequence import pad_sequences # type: ignore
-import numpy as np
-from tensorflow.keras.layers import Embedding, Input, Dense, Dropout, LayerNormalization, MultiHeadAttention # type: ignore
-from tensorflow.keras.models import Model # type: ignore
-
 import pickle
 import re
 
@@ -80,6 +74,18 @@ def cleanText(tokens, choice=2):
 
     return cleaned_text
 
+def preprocess_text(text, pre_method=2):
+    # text = text.replace('\\n', ' ')
+    text = re.sub(r'[^a-zA-Z0-9\s]|[\\n]', ' ', text) # Remove non-alphanumeric characters
+    text = re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE) # Remove URLs
+    # Tokenization
+    tokens = word_tokenize(text.lower())
+    tokens = [token for token in tokens if token not in string.punctuation and token not in stop_words]
+    
+    cleaned_text = cleanText(tokens, pre_method)
+    return cleaned_text
+
+
 def load_glove_embeddings(glove_file, word_index, embedding_dim=100):
     embeddings_index = {}
     with open(glove_file, 'r', encoding='utf8') as f:
@@ -96,53 +102,3 @@ def load_glove_embeddings(glove_file, word_index, embedding_dim=100):
             embedding_matrix[i] = embedding_vector
 
     return embedding_matrix
-
-def preprocess_text(text, pre_method=2):
-    # text = text.replace('\\n', ' ')
-    text = re.sub(r'[^a-zA-Z0-9\s]|[\\n]', ' ', text) # Remove non-alphanumeric characters
-    text = re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE) # Remove URLs
-    # Tokenization
-    tokens = word_tokenize(text.lower())
-    tokens = [token for token in tokens if token not in string.punctuation and token not in stop_words]
-    
-    cleaned_text = cleanText(tokens, pre_method)
-    return cleaned_text
-
-def preprocess(train_data, test_data, pre_method, fx_opt, glove_path=None, embedding_dim=100):
-    print('Drop Nan...')
-    print(f"\ttrain_data.shape before {train_data.shape}")
-    train_data = train_data.dropna(subset=['Discussion'])
-    print(f"\ttrain_data.shape after {train_data.shape}")
-
-    print('start preprocessing...')
-    train_Discussion_preprocessed = [preprocess_text(discussion, pre_method) for discussion in train_data['Discussion']]
-    test_Discussion_preprocessed = [preprocess_text(discussion, pre_method) for discussion in test_data['Discussion']]
-
-    print('Encoding Y_train...')
-    Y_train = train_data['Category'].map(category_encoding)
-
-
-    if fx_opt == 3:
-        print("Using GloVe embeddings with Transformer model...")
-
-        # Tokenization
-        tokenizer = Tokenizer()
-        tokenizer.fit_on_texts(train_Discussion_preprocessed)
-
-        X_train_seq = tokenizer.texts_to_sequences(train_Discussion_preprocessed)
-        X_test_seq = tokenizer.texts_to_sequences(test_Discussion_preprocessed)
-
-         # Set max_sequence_length to the longest sequence in the dataset
-        max_sequence_length = max(len(seq) for seq in X_train_seq + X_test_seq)
-
-        
-        X_train_padded = pad_sequences(X_train_seq, maxlen=max_sequence_length, padding='post')
-        
-        X_test_padded = pad_sequences(X_test_seq, maxlen=max_sequence_length, padding='post')
-
-        # Load GloVe embeddings
-        word_index = tokenizer.word_index
-        embedding_matrix = load_glove_embeddings(glove_path, word_index, embedding_dim)
-
-        return X_train_padded, Y_train, X_test_padded, embedding_matrix, max_sequence_length
-

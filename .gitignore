@@ -5,6 +5,7 @@
 *.csv
 *.h5
 *.sav
+*.zip
 
 # Ignore IDE-specific settings for PyCharm
 .idea/
