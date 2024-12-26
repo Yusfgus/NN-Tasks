@@ -3,11 +3,11 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer, SnowballStemmer
 from nltk.tokenize import word_tokenize
-
+import numpy as np
 import pickle
 import re
 
-from nltk.corpus import words
+# from nltk.corpus import words
 # english_words = set(words.words())
 stop_words = set(stopwords.words('english'))
 stemmer = SnowballStemmer('english')
@@ -85,7 +85,6 @@ def preprocess_text(text, pre_method=2):
     cleaned_text = cleanText(tokens, pre_method)
     return cleaned_text
 
-
 def load_glove_embeddings(glove_file, word_index, embedding_dim=100):
     embeddings_index = {}
     with open(glove_file, 'r', encoding='utf8') as f:
@@ -102,3 +101,4 @@ def load_glove_embeddings(glove_file, word_index, embedding_dim=100):
             embedding_matrix[i] = embedding_vector
 
     return embedding_matrix
+

@@ -55,7 +55,7 @@ class myModel():
                 if y == 1: FN+=1 
                 else: TN+=1
 
-        matrix = df = pd.DataFrame({
+        matrix = pd.DataFrame({
             'Positive': [TP, FP],
             'Negative': [FN, TN]
         }, index=['Positive', 'Negative'])
